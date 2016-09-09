@@ -14,7 +14,7 @@
             fill: seagreen;
         }
 
-        .lines {
+        /*.lines {*/
             stroke: steelblue;
             fill: none
         }
@@ -46,6 +46,7 @@
             padding: 1em;
         }
     </style>
+    <script type="text/javascript" src="script.js"></script>
 </head>
 <body>
 <body>
@@ -60,21 +61,24 @@
 <br/>
 
 <span>
-    <button>Staircase</button>
+    <button onclick="staircase()">Staircase</button>
 </span>
 
 <span>
     <label>Dataset:</label>
-    <select id="dataset">
+    <select id="dataset" onchange="changeData()">
         <option value="anscombe_I">Anscombe's Quartet I</option>
         <option selected value="anscombe_II">Anscombe's Quartet II</option>
         <option value="anscombe_III">Anscombe's Quartet III</option>
         <option value="anscombe_IV">Anscombe's Quartet IV</option>
     </select>
 </span>
-
+<script>
+    // we identify the button and add the function to be connected dynamically
+    //document.getElementById("dataset").onchange = changeData()
+</script>
 <span>
-    <input type="checkbox" id="random"> Random Subset
+    <input type="checkbox" id="random" onclick="randomSubset()"> Random Subset
 </span>
 
 <br/>
@@ -82,11 +86,31 @@
 <div>
     <h2>Bar Charts</h2>
     <svg width="200" height="200">
-        <!-- Paste your HW 1 solution here -->
+        <rect class="rectClass" x="25" y="70" width="100" height="25"/>
+        <rect class="rectClass" x="25" y="95" width="80" height="25"/>    
+        <rect class="rectClass" x="25" y="120" width="130" height="25"/> 
+        <rect class="rectClass" x="25" y="145" width="90" height="25"/>
+        <rect class="rectClass" x="25" y="170" width="110" height="25"/>    
+        <rect class="rectClass" x="25" y="195" width="140" height="25"/> 
+        <rect class="rectClass" x="25" y="220" width="60" height="25"/>
+        <rect class="rectClass" x="25" y="245" width="40" height="25"/>    
+        <rect class="rectClass" x="25" y="270" width="120" height="25"/> 
+        <rect class="rectClass" x="25" y="295" width="70" height="25"/>
+        <rect class="rectClass" x="25" y="320" width="50" height="25"/>  
     </svg>
 
     <svg width="200" height="200">
-        <!-- Paste your HW 1 solution here -->
+        <rect class="rectClass" x="300" y="70" width="80.4" height="25"/>
+        <rect class="rectClass" x="300" y="95" width="69.5" height="25"/>    
+        <rect class="rectClass" x="300" y="120" width="75.8" height="25"/> 
+        <rect class="rectClass" x="300" y="145" width="88.1" height="25"/>
+        <rect class="rectClass" x="300" y="170" width="83.3" height="25"/>    
+        <rect class="rectClass" x="300" y="195" width="99.6" height="25"/> 
+        <rect class="rectClass" x="300" y="220" width="72.4" height="25"/>
+        <rect class="rectClass" x="300" y="245" width="42.6" height="25"/>    
+        <rect class="rectClass" x="300" y="270" width="108.4" height="25"/> 
+        <rect class="rectClass" x="300" y="295" width="48.2" height="25"/>
+        <rect class="rectClass" x="300" y="320" width="56.8" height="25"/> 
     </svg>
 </div>
 
@@ -94,11 +118,20 @@
     <h2>Line Charts</h2>
 
     <svg width="200" height="200">
-        <!-- Paste your HW 1 solution here -->
+        <path class="lineClass" d="M 25 500 L 50 520 L 75 470 L 100 510 L 125 490 L 150 460 L 175 540 L 200 560 L 225 480 L 250 530 L 275 550"/>
     </svg>
 
     <svg width="200" height="200">
-        <!-- Paste your HW 1 solution here -->
+        <line class="lineClass" x1="300" y1="519.6" x2="325" y2="530.5"/>
+        <line class="lineClass" x1="325" y1="530.5" x2="350" y2="524.2"/>
+        <line class="lineClass" x1="350" y1="524.2" x2="375" y2="511.9"/>
+        <line class="lineClass" x1="375" y1="511.9" x2="400" y2="516.7"/>
+        <line class="lineClass" x1="400" y1="516.7" x2="425" y2="500.4"/>
+        <line class="lineClass" x1="425" y1="500.4" x2="450" y2="527.6"/>
+        <line class="lineClass" x1="450" y1="527.6" x2="475" y2="557.4"/>
+        <line class="lineClass" x1="475" y1="557.4" x2="500" y2="491.6"/>
+        <line class="lineClass" x1="500" y1="491.6" x2="525" y2="551.8"/>
+        <line class="lineClass" x1="525" y1="551.8" x2="550" y2="543.2"/>
     </svg>
 </div>
 
@@ -106,11 +139,11 @@
     <h2>Area Charts</h2>
 
     <svg width="200" height="200">
-        <!-- Paste your HW 1 solution here -->
+        <path class="areaClass" d="M 25 800 L 25 700 L 50 720 L 75 670 L 100 710 L 125 690 L 150 660 L 175 740 L 200 760 L 225 680 L 250 730 L 275 750 L 275 800"/>
     </svg>
 
     <svg width="200" height="200">
-        <!-- Paste your HW 1 solution here -->
+        <path class="areaClass" d="M 300 800 L 300 719.6 L 325 730.5 L 350 724.2 L 375 711.9 L 400 716.7 L 425 700.4 L 450 727.6 L 475 757.4 L 500 691.6 L 525 751.8 L 550 743.2 L 550 800"/>
     </svg>
 </div>
 
@@ -118,7 +151,17 @@
     <h2>Scatterplot</h2>
 
     <svg width="200" height="200">
-        <!-- Paste your HW 1 solution here -->
+        <circle class ="circleClass" cx="125" cy="1009.6" r="5"/>   
+        <circle class ="circleClass" cx="105" cy="1030.5" r="5"/>
+        <circle class ="circleClass" cx="155" cy="1024.2" r="5"/>
+        <circle class ="circleClass" cx="115" cy="1011.9" r="5"/>
+        <circle class ="circleClass" cx="135" cy="1016.7" r="5"/>
+        <circle class ="circleClass" cx="165" cy="1000.4" r="5"/>
+        <circle class ="circleClass" cx="85" cy="1027.6" r="5"/>
+        <circle class ="circleClass" cx="65" cy="1057.4" r="5"/>
+        <circle class ="circleClass" cx="145" cy="991.6" r="5"/>
+        <circle class ="circleClass" cx="95" cy="1051.8" r="5"/>
+        <circle class ="circleClass" cx="75" cy="1043.2" r="5"/>
     </svg>
 </div>
 </body>

@@ -2,7 +2,7 @@
 // These keep JSHint quiet if you're using it (highly recommended!)
 
 function staircase() {
-    // ****** TODO: PART II ******
+    alert("you pressed the staircase button, didn't you? oh you're such a good boy, aren't you?");
 }
 
 function update(error, data) {
@@ -83,6 +83,7 @@ function changeData() {
     // // Load the file indicated by the select menu
     var dataFile = document.getElementById('dataset').value;
     if (document.getElementById('random').checked) {
+        alert("did you select a new field?");
         randomSubset();
     }
     else{
@@ -94,6 +95,7 @@ function randomSubset() {
     // Load the file indicated by the select menu,
     // and then slice out a random chunk before
     // passing the data to update()
+    alert("randomSubset")
     var dataFile = document.getElementById('dataset').value;
     if (document.getElementById('random').checked) {
         d3.csv('data/' + dataFile + '.csv', function (error, data) {
