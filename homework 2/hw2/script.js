@@ -62,6 +62,23 @@ function update(error, data) {
     var barChart1 = d3.select("#barChart1")
     var selection = barChart1.selectAll("rect")
         .data(data)
+
+    var newRect = selection.enter().append("rect")
+        .attr("opacity", 0)
+
+    selection.exit()
+            .attr("opacity", 1)
+            .transition()
+            .duration(2000)
+            .attr("opacity", 0)
+            .remove();
+
+    selection = newRect.merge(selection);
+
+    selection
+        .transition()
+        .duration(2000)
+        .attr("opacity", 1)
         .attr("x", 10)
         .attr("y", function (d,i) { 
             return iScale(i);
@@ -69,21 +86,58 @@ function update(error, data) {
         .attr("width", function (d) {
                 return aScale(d.a);
         })
-        .attr("height", 10)
+        .attr("height", 10) 
+
+    selection 
+        .on("mouseover", function() {
+            d3.select(this)
+            .attr("fill", "red");
+        })
+        .on("mouseout", function(d) {
+            d3.select(this)
+            .attr("fill", "rgb(0, 0, " + (d * 10) + ")");
+        })
 
     // TODO: Select and update the 'b' bar chart bars
 
     var barChart2 = d3.select("#barChart2")
     var selection = barChart2.selectAll("rect")
         .data(data)
+
+    var newRect = selection.enter().append("rect")
+        .attr("opacity", 0)
+
+    selection.exit()
+            .attr("opacity", 1)
+            .transition()
+            .duration(2000)
+            .attr("opacity", 0)
+            .remove();
+
+    selection = newRect.merge(selection);
+
+    selection
+        .transition()
+        .duration(2000)
+        .attr("opacity", 1)
         .attr("x", 10)
         .attr("y", function (d,i) { 
             return iScale(i);
         })
         .attr("width", function (d) {
-            return bScale(d.b);
+                return aScale(d.b);
         })
         .attr("height", 10)
+
+    selection 
+        .on("mouseover", function() {
+            d3.select(this)
+            .attr("fill", "red");
+        })
+        .on("mouseout", function(d) {
+            d3.select(this)
+            .attr("fill", "rgb(0, 0, " + (d * 10) + ")");
+        })
 
     // TODO: Select and update the 'a' line chart path using this line generator
     var aLineGenerator = d3.line()
@@ -96,7 +150,9 @@ function update(error, data) {
 
     var lineChart1 = d3.select("#lineChart1")
     var selection = lineChart1.selectAll("path")
-        .attr("d", aLineGenerator(data));
+        .transition()
+        .duration(2000)
+        .attr("d", aLineGenerator(data))
 
 
     // TODO: Select and update the 'b' line chart path (create your own generator)
@@ -110,7 +166,9 @@ function update(error, data) {
 
     var lineChart2 = d3.select("#lineChart2")
     var selection = lineChart2.selectAll("path")
-        .attr("d", bLineGenerator(data));
+        .transition()
+        .duration(2000)
+        .attr("d", bLineGenerator(data))
 
 
     // TODO: Select and update the 'a' area chart path using this line generator
@@ -125,6 +183,8 @@ function update(error, data) {
 
     var areaChart1 = d3.select("#areaChart1")
     var selection = areaChart1.selectAll("path")
+        .transition()
+        .duration(2000)
         .attr("d", aAreaGenerator(data));
 
     // TODO: Select and update the 'b' area chart path (create your own generator)
@@ -139,6 +199,8 @@ function update(error, data) {
 
     var areaChart2 = d3.select("#areaChart2")
     var selection = areaChart2.selectAll("path")
+        .transition()
+        .duration(2000)
         .attr("d", bAreaGenerator(data));
 
     // TODO: Select and update the scatterplot points
@@ -146,15 +208,51 @@ function update(error, data) {
     var scatterPlot = d3.select("#scatterPlot")
     var selection = scatterPlot.selectAll("circle")
         .data(data)
+
+    var newPoints = selection.enter().append("circle")
+        .attr("opacity", 0)
+        .attr("transform", "translate(0, 200) scale(1, -1)")
         .attr("cx", function (d) {
             return aScale(d.a);
         })
         .attr("cy", function (d) { 
             return bScale(d.b);
         })
-        .on('click', function(d,i){ 
-            console.log('hi')
-        });
+
+    selection.exit()
+        .attr("opacity", 1)
+        .transition()
+        .duration(2000)
+        .attr("opacity", 0)
+        .remove();
+
+    selection = newPoints.merge(selection);
+
+    selection
+        .transition()
+        .duration(2000)
+        .attr("opacity", 1)
+        .attr("cx", function (d) {
+            return aScale(d.a);
+        })
+        .attr("cy", function (d) { 
+            return bScale(d.b);
+        })
+        .attr("r", 5)
+        .style("fill", "steelblue")
+
+    selection
+        .on('click', function(d) { 
+            console.log("x: " + d.a + ", "+ "y: " + d.b);
+        })
+        .on('click', function(d) { 
+            console.log("x: " + d.a + ", "+ "y: " + d.b);
+        })
+        .append("title")
+        .text(function(d) {
+            return "x: " + d.a + "\n" + "y: " + d.b;
+        })
+
 
     // ****** TODO: PART IV ******
 }
