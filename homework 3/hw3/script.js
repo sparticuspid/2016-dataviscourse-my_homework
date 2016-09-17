@@ -108,6 +108,16 @@ function updateBarChart(selectedDimension) {
     // Call the necessary update functions for when a user clicks on a bar.
     // Note: think about what you want to update when a different bar is selected.
 
+    bars
+        .on("click", highlight)
+
+}
+
+function highlight() { 
+    updateInfo()
+    updateMap()
+    d3.select(this)
+        .attr("fill", "red")
 
 }
 
@@ -186,6 +196,7 @@ function clearMap() {
     //the colors and markers for hosts/teams/winners, you can use
     //d3 selection and .classed to set these classes on and off here.
 
+    chooseData()
 }
 
 
