@@ -18,13 +18,86 @@ function updateBarChart(selectedDimension) {
     // Create the x and y scales; make
     // sure to leave room for the axes
 
+    var padding = 25;
+    var height = 400;
+    var width = 500;
+    var textWidth = 50;
+    var epsilom = 1;
+
+    var xScale = d3.scaleBand()
+        .domain(allWorldCupData.map(function (d) {
+            return d.year; 
+    }))
+        .range([width - padding*2 - textWidth - epsilom, 0]).padding(.1)
+
+    var yScale = d3.scaleLinear()
+        .domain([0, d3.max(allWorldCupData, function (d) {
+            return d[selectedDimension];
+        })])
+        .range([height - textWidth - padding*2, 0]);
+
     // Create colorScale
+
+    var colorScale = d3.scaleLinear()
+        .domain([d3.min(allWorldCupData, function (d) {
+            return d[selectedDimension];
+        }), 0, d3.max(allWorldCupData, function (d) {
+            return d[selectedDimension];
+        })])
+        .range(["darkred", "lightgray", "steelblue"]);
 
     // Create the axes (hint: use #xAxis and #yAxis)
 
+    var xAxisGroup = d3.select('#xAxis')
+        .attr("transform", "translate("  + (textWidth + padding) + ", " + (height - padding - textWidth) +")")
+
+
+    // create a new axis that has the ticks and labels on the bottom
+    var xAxis = d3.axisBottom()
+    // assign the scale to the axis
+        .scale(xScale)
+
+    xAxisGroup
+        .call(xAxis)
+
+    xAxisGroup.selectAll("text")  
+        .style("text-anchor", "end")
+        .attr("dx", "-.8em")
+        .attr("dy", "-.4em")
+        .attr("transform", "rotate(-90)" );
+
+    var yAxisGroup = d3.select('#yAxis')
+        .attr("transform", "translate(" + (padding + textWidth) + "," + padding + ")")
+
+    var yAxis = d3.axisLeft();
+
+    // assign the scale to the axis
+    yAxis.scale(yScale);
+    yAxisGroup.call(yAxis);
+
     // Create the bars (hint: use #bars)
 
+    var bars = d3.select('#bars').selectAll('rect').data(allWorldCupData);
 
+    //Exit old elements
+    bars.exit().remove();
+
+    bars = bars.enter().append('rect')
+        .merge(bars)
+
+    bars
+        .attr('height', function (d) {
+            return yScale(0) - yScale(d[selectedDimension]);
+        })
+        .attr('width', xScale.bandwidth())
+        .attr('x', function (d, i) {
+             return xScale(d.year);
+         })
+        .attr('fill', function (d) {
+            return colorScale(d[selectedDimension]);
+        })
+        .attr("transform", "translate(" + (padding + textWidth + epsilom) + "," + (height - padding - textWidth) + ") scale(1, -1)")
+        
 
     // ******* TODO: PART II *******
 
@@ -47,8 +120,12 @@ function updateBarChart(selectedDimension) {
 function chooseData() {
 
     // ******* TODO: PART I *******
+
     //Changed the selected data when a user selects a different
     // menu item from the drop down.
+
+    var selectedWorldCupData = document.getElementById('dataset').value
+    updateBarChart(selectedWorldCupData);
 
 }
 
