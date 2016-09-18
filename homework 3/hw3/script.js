@@ -98,7 +98,7 @@ function updateBarChart(selectedDimension) {
         })
         .attr("transform", "translate(" + (padding + textWidth + epsilom) + "," + (height - padding - textWidth) + ") scale(1, -1)")
         .attr("id",function (d) { 
-            return d.year;
+            return d.YEAR;
         })
 
     // ******* TODO: PART II *******
@@ -110,17 +110,20 @@ function updateBarChart(selectedDimension) {
     // Call the necessary update functions for when a user clicks on a bar.
     // Note: think about what you want to update when a different bar is selected.
 
-    bars.on("click", highlight)
+    bars.on("click", clickEvent)
 
 }
 
-function highlight(d) { 
+function clickEvent(d) { 
 
-    // console.log(d.host, d.winner);
-    updateInfo(d)
-    updateMap(d)
+    updateInfo(d);
+    updateMap(d);
+
+    d3.select("#bars").selectAll("rect")
+        .classed("selected", false);
+
     d3.select(this)
-        .attr("fill", "red");
+        .classed("selected", true);
 
 }
 
@@ -157,19 +160,19 @@ function updateInfo(oneWorldCup) {
     // Hint: For the list of teams, you can create an list element for each team.
     // Hint: Select the appropriate ids to update the text content.
 
+    d3.select('#edition').text(oneWorldCup.EDITION);
     d3.select('#host').text(oneWorldCup.host);
     d3.select('#winner').text(oneWorldCup.winner);
     d3.select('#silver').text(oneWorldCup.runner_up);
-
 
     d3.select('#teams').html('')
         .append('ul')
         .selectAll('li').data(oneWorldCup.teams_names)
         .enter()
-            .append('li')
-            .text(function(d) {
-                return d;
-            });
+        .append('li')
+        .text(function(d) {
+            return d;
+        });
 }
 
 /**
@@ -201,11 +204,6 @@ function drawMap(world) {
 
     var grat = d3.geoGraticule();
 
-    d3.select('#map').append('path')
-        .datum(grat)
-        .attr("class", "grat")
-        .attr("d", path);
-
     //Bind data and create one path per GeoJSON feature
     map = d3.select('#map').selectAll('path.countries')
                 .data(topojson.feature(world, world.objects.countries).features)
@@ -213,11 +211,15 @@ function drawMap(world) {
                 .append("path")
                 // here we use the familiar d attribute again to define the path
                 .attr("d", path)
-                .attr("class", 'countries')
+                .classed("countries", true)
                 .attr("id", function (d) {
-                    console.log(d.id)
                     return d.id
                 })
+
+    d3.select('#map').append('path')
+        .datum(grat)
+        .classed("grat", true)
+        .attr("d", path);
 
 }
 
@@ -233,8 +235,15 @@ function clearMap() {
     //Hint: If you followed our suggestion of using classes to style
     //the colors and markers for hosts/teams/winners, you can use
     //d3 selection and .classed to set these classes on and off here.
-
-    chooseData()
+    
+    d3.select('#map').selectAll(".team")  
+        .classed("team", false)
+        .classed("countries", true)
+    d3.select('#map').select(".host")
+        .classed("host", false)  
+        .classed("countries", true)
+    d3.select('#points')
+        .html('')
 }
 
 
@@ -255,6 +264,20 @@ function updateMap(worldcupData) {
     // as well as a .silver. These have styling attributes for the two
     //markers.
 
+    d3.select('#points')
+        .append("circle")
+        .attr("transform", "translate(" + 
+            projection([worldcupData.win_pos[0],worldcupData.win_pos[1]]) + ")")
+        .style("r", 8)
+        .attr("class", "gold")
+
+    d3.select('#points')
+        .append("circle")
+        .attr("transform", "translate(" + 
+            projection([worldcupData.ru_pos[0],worldcupData.ru_pos[1]]) + ")")
+        .style("r", 8)
+        .attr("class", "silver")
+
 
     //Select the host country and change it's color accordingly.
 
@@ -263,7 +286,13 @@ function updateMap(worldcupData) {
     //We strongly suggest using classes to style the selected countries.
 
 
+    for (var i in worldcupData.teams_iso) {
+        var teams = d3.select('#map').select("#" + worldcupData.teams_iso[i])
+            .attr("class", "team")
+    }
 
+    d3.select('#map').select("#" + worldcupData.host_country_code)  
+        .attr("class", "host")
 }
 
 /* DATA LOADING */
