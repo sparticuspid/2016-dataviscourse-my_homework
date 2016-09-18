@@ -63,7 +63,7 @@ function updateBarChart(selectedDimension) {
     xAxisGroup.selectAll("text")  
         .style("text-anchor", "end")
         .attr("dx", "-.8em")
-        .attr("dy", "-.4em")
+        .attr("dy", "-.3em")
         .attr("transform", "rotate(-90)" );
 
     var yAxisGroup = d3.select('#yAxis')
@@ -97,7 +97,9 @@ function updateBarChart(selectedDimension) {
             return colorScale(d[selectedDimension]);
         })
         .attr("transform", "translate(" + (padding + textWidth + epsilom) + "," + (height - padding - textWidth) + ") scale(1, -1)")
-        
+        .attr("id",function (d) { 
+            return d.year;
+        })
 
     // ******* TODO: PART II *******
 
@@ -108,16 +110,54 @@ function updateBarChart(selectedDimension) {
     // Call the necessary update functions for when a user clicks on a bar.
     // Note: think about what you want to update when a different bar is selected.
 
-    bars
-        .on("click", highlight)
+    bars.on("click", highlight)
 
 }
 
-function highlight() { 
-    updateInfo()
-    updateMap()
+function highlight(d) { 
+
+    // console.log(d.host, d.winner);
+    updateInfo(d)
+    updateMap(d)
     d3.select(this)
-        .attr("fill", "red")
+        .attr("fill", "red");
+
+//     var host = d3.select('#host').selectAll('text').data(allWorldCupData, function(d) {
+//     return d.host;
+// })
+
+// var year = d3.each(function() {
+//   d3.select(this).attr('id'); // Logs the id attribute.
+// })
+//     console.log(year)
+
+
+// host.enter().append('text')
+//     .merge(host)
+//     // var host = d3.select('#host')
+//     // host.append('text').data(function(d) {
+//     //         return d })
+//     //         .text(function(d) {
+//     //         return d.host
+//     //     })
+
+//   data.map(function(d) {
+//     if (d['Year']=='2014') {
+//         console.log( d['AvgPer9inn'] );
+//     }
+//   });
+
+// var hostContainerText = hostContainer
+//         .append("text")
+        //and so on
+
+
+
+
+    // var host = d3.select('#host').selectAll('text').data(oneWorldCup)
+
+    // host.enter().append('text')
+    //     .merge(host)
 
 }
 
@@ -154,7 +194,19 @@ function updateInfo(oneWorldCup) {
     // Hint: For the list of teams, you can create an list element for each team.
     // Hint: Select the appropriate ids to update the text content.
 
+    d3.select('#host').text(oneWorldCup.host);
+    d3.select('#winner').text(oneWorldCup.winner);
+    d3.select('#silver').text(oneWorldCup.runner_up);
 
+
+    d3.select('#teams').html('')
+        .append('ul')
+        .selectAll('li').data(oneWorldCup.teams_names)
+        .enter()
+            .append('li')
+            .text(function(d) {
+                return d;
+            });
 }
 
 /**
