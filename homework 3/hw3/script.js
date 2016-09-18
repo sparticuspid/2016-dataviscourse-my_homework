@@ -122,43 +122,6 @@ function highlight(d) {
     d3.select(this)
         .attr("fill", "red");
 
-//     var host = d3.select('#host').selectAll('text').data(allWorldCupData, function(d) {
-//     return d.host;
-// })
-
-// var year = d3.each(function() {
-//   d3.select(this).attr('id'); // Logs the id attribute.
-// })
-//     console.log(year)
-
-
-// host.enter().append('text')
-//     .merge(host)
-//     // var host = d3.select('#host')
-//     // host.append('text').data(function(d) {
-//     //         return d })
-//     //         .text(function(d) {
-//     //         return d.host
-//     //     })
-
-//   data.map(function(d) {
-//     if (d['Year']=='2014') {
-//         console.log( d['AvgPer9inn'] );
-//     }
-//   });
-
-// var hostContainerText = hostContainer
-//         .append("text")
-        //and so on
-
-
-
-
-    // var host = d3.select('#host').selectAll('text').data(oneWorldCup)
-
-    // host.enter().append('text')
-    //     .merge(host)
-
 }
 
 /**
@@ -232,6 +195,29 @@ function drawMap(world) {
     // Make sure and give your paths the appropriate class (see the .css selectors at
     // the top of the provided html file)
 
+    // Define default path generator
+    var path = d3.geoPath()
+            .projection(projection);
+
+    var grat = d3.geoGraticule();
+
+    d3.select('#map').append('path')
+        .datum(grat)
+        .attr("class", "grat")
+        .attr("d", path);
+
+    //Bind data and create one path per GeoJSON feature
+    map = d3.select('#map').selectAll('path.countries')
+                .data(topojson.feature(world, world.objects.countries).features)
+                .enter()    
+                .append("path")
+                // here we use the familiar d attribute again to define the path
+                .attr("d", path)
+                .attr("class", 'countries')
+                .attr("id", function (d) {
+                    console.log(d.id)
+                    return d.id
+                })
 
 }
 
