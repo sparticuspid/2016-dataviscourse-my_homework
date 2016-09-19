@@ -1,6 +1,7 @@
 // Global var for FIFA world cup data
 var allWorldCupData;
-
+var selectedCountry;
+var barClickData;
 
 /**
  * Render and update the bar chart based on the selection of the data type in the drop-down box
@@ -110,12 +111,13 @@ function updateBarChart(selectedDimension) {
     // Call the necessary update functions for when a user clicks on a bar.
     // Note: think about what you want to update when a different bar is selected.
 
-    bars.on("click", clickEvent)
+    bars.on("click", barClickEvent)
 
 }
 
-function clickEvent(d) { 
+function barClickEvent(d) { 
 
+    barClickData = d;
     updateInfo(d);
     updateMap(d);
 
@@ -123,6 +125,24 @@ function clickEvent(d) {
         .classed("selected", false);
 
     d3.select(this)
+        .classed("selected", true);
+
+}
+
+function countryClickEvent(d) { 
+
+    selectedCountry = this.id
+
+    updateProfile(d)
+    if (barClickData == null) {}
+    else {updateMap(barClickData);}
+
+    d3.select("#map").selectAll("path")
+        .classed("selected", false)
+        .classed("countries", true);
+
+    d3.select(this)
+        .classed("countries", false)
         .classed("selected", true);
 
 }
@@ -175,6 +195,52 @@ function updateInfo(oneWorldCup) {
         });
 }
 
+function updateProfile(oneCountry) {
+
+    // ******* TODO: PART III *******
+
+    // Update the text elements in the infoBox to reflect:
+    // World Cup Title, host, winner, runner_up, and all participating teams that year
+
+    // Hint: For the list of teams, you can create an list element for each team.
+    // Hint: Select the appropriate ids to update the text content.
+
+    countryProfile = d3.select("#profile")
+
+    countryProfile
+        .select('#country').text(country_codes[oneCountry.id]);
+
+    participation = countryProfile.select('#participation').html('')
+         .append('ul')
+
+    years_won = countryProfile.select('#years_won').html('')
+         .append('ul')
+
+    years_runner_up = countryProfile.select('#years_runner_up').html('')
+         .append('ul')
+
+    for (row in allWorldCupData) {
+        for (teams in allWorldCupData[row].teams_iso) {
+            if (oneCountry.id == allWorldCupData[row].teams_iso[teams]) {
+                participation
+                    .append('li')
+                    .text(allWorldCupData[row].year)
+            }
+        }
+        if (country_codes[oneCountry.id] == allWorldCupData[row].winner) {
+            years_won
+                .append('li')
+                .text(allWorldCupData[row].year)
+        }
+        if (country_codes[oneCountry.id] == allWorldCupData[row].runner_up) {
+            years_runner_up
+                .append('li')
+                .text(allWorldCupData[row].year)
+        }
+    }
+
+}
+
 /**
  * Renders and updated the map and the highlights on top of it
  *
@@ -204,6 +270,11 @@ function drawMap(world) {
 
     var grat = d3.geoGraticule();
 
+    d3.select('#map').append('path')
+        .datum(grat)
+        .classed("grat", true)
+        .attr("d", path);
+
     //Bind data and create one path per GeoJSON feature
     map = d3.select('#map').selectAll('path.countries')
                 .data(topojson.feature(world, world.objects.countries).features)
@@ -216,11 +287,9 @@ function drawMap(world) {
                     return d.id
                 })
 
-    d3.select('#map').append('path')
-        .datum(grat)
-        .classed("grat", true)
-        .attr("d", path);
+    country = d3.select("#map").selectAll("path")
 
+    country.on("click", countryClickEvent)
 }
 
 /**
@@ -287,12 +356,20 @@ function updateMap(worldcupData) {
 
 
     for (var i in worldcupData.teams_iso) {
-        var teams = d3.select('#map').select("#" + worldcupData.teams_iso[i])
-            .attr("class", "team")
+        if (worldcupData.teams_iso[i] == selectedCountry) {
+
+        }
+        else {
+            var teams = d3.select('#map').select("#" + worldcupData.teams_iso[i])
+                .attr("class", "team")
+        }
     }
 
-    d3.select('#map').select("#" + worldcupData.host_country_code)  
-        .attr("class", "host")
+    if (worldcupData.host_country_code == selectedCountry) {}
+    else {
+        d3.select('#map').select("#" + worldcupData.host_country_code)  
+            .attr("class", "host")
+    }
 }
 
 /* DATA LOADING */
