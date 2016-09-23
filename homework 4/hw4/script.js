@@ -50,11 +50,11 @@ var rank = {
 //For the HACKER version, comment out this call to d3.json and implement the commented out
 // d3.csv call below.
 
-d3.json('data/fifa-matches.json',function(error,data){
-    teamData = data;
-    createTable();
-    updateTable();
-})
+// d3.json('data/fifa-matches.json',function(error,data){
+//     teamData = data;
+//     createTable();
+//     updateTable();
+// })
 
 
 // // ********************** HACKER VERSION ***************************
@@ -63,12 +63,56 @@ d3.json('data/fifa-matches.json',function(error,data){
 //  * then calls the appropriate functions to create and populate the table.
 //  *
 //  */
-// d3.csv("data/fifa-matches.csv", function (error, csvData) {
-//
-//    // ******* TODO: PART I *******
-//
-//
-// });
+
+d3.csv("data/fifa-matches.csv", function (error, csvData) {
+
+   // ******* TODO: PART I *******
+    teamData = d3.nest()
+    .key(function (d) {
+        return d.Team;
+    })
+    .rollup(function (leaves) {
+        return {
+            "Wins": d3.sum(leaves,function(d){return d.Wins}),
+            "Losses": d3.sum(leaves,function(d){return d.Losses}),
+            "Goals Made": d3.sum(leaves,function(d){return d["Goals Made"]}),
+            "Goals Conceded": d3.sum(leaves,function(d){return d["Goals Conceded"]}),
+            "Delta Goals": d3.sum(leaves,function(d){return d["Delta Goals"]}),
+            "TotalGames": leaves.length,
+            "Result":  {
+                "label": d3.max(leaves,function(d){return d.Result}),
+                "ranking": leaves.length - 2
+            }, 
+            "type": "aggregate",
+            "games": 
+                d3.nest()
+                    .key(function (d) {
+                        return d.Opponent;
+                    })
+                    .rollup(function(games) {
+                        return {
+                            "Wins": [], //d3.sum(games,function(d){return d.Wins}),
+                            "Losses": [], //d3.sum(games,function(d){return d.Losses}),
+                            "Goals Made": d3.sum(games,function(d){return d["Goals Made"]}),
+                            "Goals Conceded": d3.sum(games,function(d){return d["Goals Conceded"]}),
+                            "Delta Goals": [], //d3.sum(games,function(d){return d["Delta Goals"]}),
+                            "Result":  {
+                                "label": d3.max(leaves,function(d){return d.Result}),
+                                "ranking": leaves.length - 2
+                            }, 
+                            "type": "game",
+                            "Opponent": d3.max(games,function(d){return d.Team}),
+                        }
+                    })
+                    .entries(leaves)
+        }
+    })
+    .entries(csvData);
+
+    createTable();
+    updateTable();
+});
+
 // // ********************** END HACKER VERSION ***************************
 
 /**
