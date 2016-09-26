@@ -213,6 +213,7 @@ function updateTable() {
     td
         .enter()
         .append("td")
+        .style("padding-left", 0)
 
     gameScale
         .domain([0, d3.max(teamData, function (d, i) {    
@@ -279,16 +280,45 @@ function updateTable() {
                 return d.value
             })
             .attr("y", cellBuffer)
+            .attr("x", 5)
 
     td_goals = d3.select("#matchTable").select("tbody").selectAll("td")
         .filter(function (d) {
             return d.vis == 'goals'
         })
         .append("svg")
-            .attr("width", cellWidth*2)
+            .attr("width", 2 * cellWidth)
             .attr("height", cellHeight)
 
+    td_delta_goals = td_goals     
+        .append("rect")
+        .classed("goalBar", true)
+        .attr("fill", function (d) {
+            if (d.value["Delta Goals"] > 0) {
+                return "#6594b0"
+            }
+            else {return "#e27375"}                
+        })
+        .attr("x", function (d) {
+            console.log(goalScale(d.value["Goals Conceded"]))
+            if (d.value["Goals Conceded"] < d.value["Goals Made"]) {
+                return goalScale(d.value["Goals Conceded"])
+            }
+            else {return goalScale(d.value["Goals Made"])}
+        })
+        .attr("height", 10)
+        .attr("width", function (d) {
+            if (d.value["Goals Conceded"] > d.value["Goals Made"]) {
+                return goalScale(d.value["Goals Conceded"]) - goalScale(d.value["Goals Made"])
+            }
+            else {return goalScale(d.value["Goals Made"]) - goalScale(d.value["Goals Conceded"])}    
+        })
+        .attr("y", 5)
+
     td_goals_made = td_goals
+        .filter(function (d) {
+            return d.value["Delta Goals"] != 0
+        })
         .append("circle")
         .classed("goalCircle", true)
         .classed("goalsMade", true)
@@ -296,9 +326,12 @@ function updateTable() {
             console.log(goalScale(d.value["Goals Made"]))
             return goalScale(d.value["Goals Made"])
         })
-        .attr("cy", cellBuffer)
+        .attr("cy", 10)
 
     td_goals_conceded = td_goals
+        .filter(function (d) {
+            return d.value["Delta Goals"] != 0
+        })
         .append("circle")
         .classed("goalCircle", true)
         .classed("goalsConceded", true)
@@ -306,71 +339,21 @@ function updateTable() {
             console.log(goalScale(d.value["Goals Conceded"]))
             return goalScale(d.value["Goals Conceded"])
         })
-        .attr("cy", cellBuffer)
+        .attr("cy", 10)
 
-    td_delta_goals = td_goals
-        .append("rect")
-        .classed("goalBar", true)
-        .attr("x", function (d) {
+    td_goals_equal = td_goals
+        .filter(function (d) {
+            return d.value["Delta Goals"] == 0
+        })
+        .append("circle")
+        .classed("goalCircle", true)
+        .classed("goalsEqual", true)
+        .attr("cx", function (d) {
             console.log(goalScale(d.value["Goals Conceded"]))
             return goalScale(d.value["Goals Conceded"])
         })
-        .attr("height", 10)
-        .attr("width", function (d) {
-            console.log(goalScale(d.value["Goals Conceded"]))
-            return goalScale(d.value["Delta Goals"])
-        })
-        .attr("y", 10)
+        .attr("cy", 10)
 
-        // .text(function (d) {
-        //     return d.value
-        // })               
- 
-        // .filter(function (d) {
-        //     return d.vis == 'text'
-        // })
-        // .text(function (d) {
-        //     return d.value
-        // })
-
-    // td_bars = td.selectAll("svg")
-    //     .data( function (d) {
-    //         console.log(d)
-    //         return d
-    //     })
-    //     .enter()
-    //     .append("svg")
-    //     .filter(function (d) {
-    //         return d.vis == 'bars'
-    //     })   
-        
-
-    // td_bars = d3.select("#matchTable").select("tbody").selectAll("tr").selectAll("td").selectAll("svg")
-    //     .enter()
-    //     .filter(function (d) {
-    //         return d.vis == 'goals'
-    //     })
-
-    // td_bars
-    //     .enter()
-    //     .append("svg")
-
-
-    // td = td.filter(function (d) {
-    //     console.log(d.vis)
-    //     return d.vis == "text"
-    // })
-    //     .text(function (d) {
-    //         return d.value
-    //     })
-
-    // console.log(td)
-    // td
-
-    //     .text(function (d) {
-    //         console.log(d)
-    //         return d.type
-    //     })
 };
 
 

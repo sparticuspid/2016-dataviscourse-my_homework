@@ -123,6 +123,10 @@ header {
     fill: #364e74;
 }
 
+.goalsEqual {
+    fill: #808080;
+}
+
 .loser text {
     text-shadow: 0 1px 0 #fff, 0 -1px 0 #fff, 1px 0 0 #fff, -1px 0 0 #fff;
 }
