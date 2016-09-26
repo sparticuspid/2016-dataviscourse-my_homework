@@ -111,8 +111,7 @@ header {
     r:5;
 }
 
-
-.node circle {
+.node circle, .goalsConceded {
     fill: #be2714;
 }
 
@@ -120,7 +119,7 @@ header {
     font: 14px sans-serif;
 }
 
-.winner circle {
+.winner circle, .goalsMade {
     fill: #364e74;
 }
 
@@ -150,6 +149,13 @@ header {
     width: 650px;
     padding: 0.5em;
     float: left;
+}
+
+.teamName {
+    text-align: right;
+    border-left: none;
+    font-weight: bold;
+    color: #317f19; 
 }
 
 
