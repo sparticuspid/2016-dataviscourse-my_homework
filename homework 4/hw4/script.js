@@ -4,6 +4,8 @@ var teamData;
 /** Global var for list of all elements that will populate the table.*/
 var tableElements;
 
+/** Global variable that keeps track of selected row */
+var selectedRow = 0;
 
 /** Variables to be used when sizing the svgs in the table cells.*/
 var cellWidth = 70,
@@ -92,9 +94,10 @@ d3.csv("data/fifa-matches.csv", function (error, csvData) {
                         return {
                             "Wins": [], //d3.sum(games,function(d){return d.Wins}),
                             "Losses": [], //d3.sum(games,function(d){return d.Losses}),
+                            "TotalGames": [],
                             "Goals Made": d3.sum(games,function(d){return d[goalsMadeHeader]}),
                             "Goals Conceded": d3.sum(games,function(d){return d[goalsConcededHeader]}),
-                            "Delta Goals": [], //d3.sum(games,function(d){return d["Delta Goals"]}),
+                            "Delta Goals": d3.sum(games,function(d){return d["Delta Goals"]}),
                             "Result":  {
                                 "label": d3.max(games,function(d){return d.Result}),
                                 "ranking": rank[d3.max(games,function(d){return d.Result})]
@@ -190,10 +193,21 @@ function updateTable() {
             return d.value["Goals Made"];
         })])
 
-    var tr = d3.select("#matchTable").select("tbody").selectAll("tr")
-        .data(tableElements)
+    gameScale
+        .domain([0, d3.max(teamData, function (d, i) {    
+            return d.value["TotalGames"];
+        })])
+
+    d3.select("#matchTable").select("tbody").selectAll("tr")
+        .remove()
+
+    tr = d3.select("#matchTable").select("tbody").selectAll("tr").data(tableElements)  
+        // .exit()
+        // .remove()
         .enter()
-        .append("tr")
+        .append('tr')
+
+    // tr = d3.select("#matchTable").select("tbody").selectAll("tr").data(tableElements)
 
     var td = tr.selectAll("td")
         .data( function (d) {
@@ -214,11 +228,6 @@ function updateTable() {
         .enter()
         .append("td")
         .style("padding-left", 0)
-
-    gameScale
-        .domain([0, d3.max(teamData, function (d, i) {    
-            return d.value["TotalGames"];
-        })])
 
     aggregateColorScale
         .domain([0, d3.max(teamData, function (d, i) {    
@@ -250,7 +259,7 @@ function updateTable() {
             return gameScale(d.value)
         })
         .attr("x", function (d) {
-            return gameScale(d.value) - 10
+            return Math.max(0,gameScale(d.value) - 10)
         })
         .attr("y", cellBuffer)
         .attr("fill", "white")
@@ -263,9 +272,10 @@ function updateTable() {
             return d.vis == 'team'
         })
         .attr("width", cellWidth*5)
-        .classed("teamName", true)
+        .attr("class", function (d) {return d.type + "TeamName"})
         .text(function (d) {
-            return d.value
+            if (d.type == "game") {return "x" + d.value}
+            else {return d.value}
         })
 
     td_result = d3.select("#matchTable").select("tbody").selectAll("td")
@@ -294,36 +304,38 @@ function updateTable() {
         .append("rect")
         .classed("goalBar", true)
         .attr("fill", function (d) {
-            if (d.value["Delta Goals"] > 0) {
-                return "#6594b0"
-            }
+            if (d.value["Delta Goals"] > 0) {return "#6594b0"}
             else {return "#e27375"}                
         })
         .attr("x", function (d) {
-            console.log(goalScale(d.value["Goals Conceded"]))
             if (d.value["Goals Conceded"] < d.value["Goals Made"]) {
                 return goalScale(d.value["Goals Conceded"])
             }
             else {return goalScale(d.value["Goals Made"])}
         })
-        .attr("height", 10)
         .attr("width", function (d) {
             if (d.value["Goals Conceded"] > d.value["Goals Made"]) {
                 return goalScale(d.value["Goals Conceded"]) - goalScale(d.value["Goals Made"])
             }
             else {return goalScale(d.value["Goals Made"]) - goalScale(d.value["Goals Conceded"])}    
         })
-        .attr("y", 5)
+        .attr("height", function (d) {
+            if (d.type == "aggregate") {return 10}
+            else {return 5} 
+        })
+        .attr("y", function (d) {
+            if (d.type == "aggregate") {return 5}
+            else {return 8} 
+        })
 
     td_goals_made = td_goals
         .filter(function (d) {
             return d.value["Delta Goals"] != 0
         })
         .append("circle")
+        .attr("class", function (d) {return d.type + "GoalsMade"})
         .classed("goalCircle", true)
-        .classed("goalsMade", true)
         .attr("cx", function (d) {
-            console.log(goalScale(d.value["Goals Made"]))
             return goalScale(d.value["Goals Made"])
         })
         .attr("cy", 10)
@@ -333,10 +345,10 @@ function updateTable() {
             return d.value["Delta Goals"] != 0
         })
         .append("circle")
+        .attr("class", function (d) {console.log(d.type + "GoalsConceded") 
+            return d.type + "GoalsConceded"})
         .classed("goalCircle", true)
-        .classed("goalsConceded", true)
         .attr("cx", function (d) {
-            console.log(goalScale(d.value["Goals Conceded"]))
             return goalScale(d.value["Goals Conceded"])
         })
         .attr("cy", 10)
@@ -346,14 +358,18 @@ function updateTable() {
             return d.value["Delta Goals"] == 0
         })
         .append("circle")
+        .attr("class", function (d) {return d.type + "GoalsEqual"})
         .classed("goalCircle", true)
-        .classed("goalsEqual", true)
         .attr("cx", function (d) {
-            console.log(goalScale(d.value["Goals Conceded"]))
             return goalScale(d.value["Goals Conceded"])
         })
         .attr("cy", 10)
 
+    tr.on("click", updateList)
+
+    logo = d3.select("#logo")
+
+    logo.on("click", collapseList)
 };
 
 
@@ -364,18 +380,33 @@ function updateTable() {
 function collapseList() {
 
     // ******* TODO: PART IV *******
-
-
+    var i = 0
+    while (i < tableElements.length - 1) {
+        if (tableElements[i].value.type == "game") {tableElements.splice(i, 1)}
+        else {i++}
+    }
+    updateTable()
 }
 
 /**
  * Updates the global tableElements variable, with a row for each row to be rendered in the table.
  *
  */
-function updateList(i) {
+function updateList(d,i) {
 
     // ******* TODO: PART IV *******
 
+    if (d.value.type == "aggregate") {
+        while ((selectedRow < tableElements.length - 1) && (tableElements[selectedRow + 1].value.type == "game")) {
+            tableElements.splice(selectedRow + 1, 1)
+            if (selectedRow < i) {i--;}
+        }
+        for (game in d.value.games) {
+            tableElements.splice(i+1, 0, d.value.games[game])
+        }
+        selectedRow = i;
+    }
+    updateTable()
 
 }
 

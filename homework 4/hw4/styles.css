@@ -102,8 +102,8 @@ header {
     height: 100px;
 }
 
-.goalBar{
-    opacity:0.6;
+.goalBar {
+    opacity: 0.6;
 }
 
 .goalCircle{
@@ -111,7 +111,7 @@ header {
     r:5;
 }
 
-.node circle, .goalsConceded {
+.node circle, .aggregateGoalsConceded {
     fill: #be2714;
 }
 
@@ -119,12 +119,27 @@ header {
     font: 14px sans-serif;
 }
 
-.winner circle, .goalsMade {
+.winner circle, .aggregateGoalsMade {
     fill: #364e74;
 }
 
-.goalsEqual {
+.aggregateGoalsEqual {
     fill: #808080;
+}
+
+.gameGoalsConceded {
+    stroke: #be2714;
+    fill: white;
+}
+
+.gameGoalsMade {
+    stroke: #364e74;
+    fill: white;
+}
+
+.gameGoalsEqual {
+    stroke: #808080;
+    fill: white;
 }
 
 .loser text {
@@ -155,11 +170,18 @@ header {
     float: left;
 }
 
-.teamName {
+.aggregateTeamName {
     text-align: right;
     border-left: none;
     font-weight: bold;
     color: #317f19; 
+}
+
+.gameTeamName {
+    text-align: right;
+    border-left: none;
+    font-weight: bold;
+    color: #b1b1b1; 
 }
 
 
