@@ -4,8 +4,9 @@ var teamData;
 /** Global var for list of all elements that will populate the table.*/
 var tableElements;
 
-/** Global variable that keeps track of selected row */
-var selectedRow = 0;
+/* Global variables for sorting */
+var currSort = '';
+var ascInd = false;
 
 /** Variables to be used when sizing the svgs in the table cells.*/
 var cellWidth = 70,
@@ -47,6 +48,17 @@ var rank = {
     'Group': 0
 };
 
+var rev_rank = {
+    7: "Winner",
+    6: "Runner-Up",
+    5: 'Third Place',
+    4: 'Fourth Place',
+    3: 'Semi Finals',
+    2: 'Quarter Finals',
+    1: 'Round of Sixteen',
+    0: 'Group'
+};
+
 //For the HACKER version, comment out this call to d3.json and implement the commented out
 // d3.csv call below.
 
@@ -67,7 +79,6 @@ var rank = {
 d3.csv("data/fifa-matches.csv", function (error, csvData) {
 
    // ******* TODO: PART I *******
-   console.log(csvData)
     teamData = d3.nest()
     .key(function (d) {
         return d.Team;
@@ -81,8 +92,8 @@ d3.csv("data/fifa-matches.csv", function (error, csvData) {
             "Delta Goals": d3.sum(leaves,function(d){return d["Delta Goals"]}),
             "TotalGames": leaves.length,
             "Result":  {
-                "label": d3.max(leaves,function(d){return d.Result}),
-                "ranking": rank[d3.max(leaves,function(d){return d.Result})]
+                "label": rev_rank[d3.max(leaves,function(d){return rank[d.Result]})],
+                "ranking": d3.max(leaves,function(d){return rank[d.Result]})
             }, 
             "type": "aggregate",
             "games": 
@@ -99,8 +110,8 @@ d3.csv("data/fifa-matches.csv", function (error, csvData) {
                             "Goals Conceded": d3.sum(games,function(d){return d[goalsConcededHeader]}),
                             "Delta Goals": d3.sum(games,function(d){return d["Delta Goals"]}),
                             "Result":  {
-                                "label": d3.max(games,function(d){return d.Result}),
-                                "ranking": rank[d3.max(games,function(d){return d.Result})]
+                                "label": rev_rank[d3.max(games,function(d){return rank[d.Result]})],
+                                "ranking": d3.max(games,function(d){return rank[d.Result]})
                             }, 
                             "type": "game",
                             "Opponent": d3.max(games,function(d){return d.Team}),
@@ -178,8 +189,81 @@ function createTable() {
 
     // ******* TODO: PART V *******
 
+    header = d3.select("#matchTable").select("thead").selectAll("tr").selectAll("td")
+        .on("click", sort)
+
+    teamHeader = d3.select("#matchTable").select("thead").selectAll("tr").selectAll("th")
+        .on("click", sort)
 }
 
+function sort() {
+
+    collapseList()
+    header = d3.select(this).text()
+
+    if (header == 'Team') {
+        if ((currSort == header) && (ascInd == true)) {
+            tableElements = tableElements.sort(function (a,b) {return d3.descending(a.key, b.key)})
+            ascInd = false
+        }
+        else {  
+            tableElements = tableElements.sort(function (a,b) {return d3.ascending(a.key, b.key)})
+            ascInd = true
+        }
+    }   
+    if (header == ' Goals ') {
+        if ((currSort == header) && (ascInd == false))   {
+            tableElements = tableElements.sort(function (a,b) {return d3.ascending(a.value["Delta Goals"], b.value["Delta Goals"])})
+            ascInd = true
+        }
+        else {
+            tableElements = tableElements.sort(function (a,b) {return d3.descending(a.value["Delta Goals"], b.value["Delta Goals"])})
+            ascInd = false
+        }
+    }
+    if (header == 'Round/Result') {
+        if ((currSort == header) && (ascInd == false))   {
+            tableElements = tableElements.sort(function (a,b) {return d3.ascending(a.value.Result.ranking, b.value.Result.ranking)})
+            ascInd = true
+        }
+        else {
+            tableElements = tableElements.sort(function (a,b) {return d3.descending(a.value.Result.ranking, b.value.Result.ranking)})
+            ascInd = false
+        }
+    }
+    if (header == 'Wins') {
+        if ((currSort == header) && (ascInd == false))   {
+            tableElements = tableElements.sort(function (a,b) {return d3.ascending(a.value.Wins, b.value.Wins)})
+            ascInd = true
+        }
+        else {
+            tableElements = tableElements.sort(function (a,b) {return d3.descending(a.value.Wins, b.value.Wins)})
+            ascInd = false
+        }
+    }
+    if (header == 'Losses') {
+        if ((currSort == header) && (ascInd == false))   {
+            tableElements = tableElements.sort(function (a,b) {return d3.ascending(a.value.Losses, b.value.Losses)})
+            ascInd = true
+        }
+        else {
+            tableElements = tableElements.sort(function (a,b) {return d3.descending(a.value.Losses, b.value.Losses)})
+            ascInd = false
+        }
+    }
+    if (header == 'Total Games') {
+        if ((currSort == header) && (ascInd == false))   {
+            tableElements = tableElements.sort(function (a,b) {return d3.ascending(a.value.TotalGames, b.value.TotalGames)})
+            ascInd = true 
+        }
+        else {
+            tableElements = tableElements.sort(function (a,b) {return d3.descending(a.value.TotalGames, b.value.TotalGames)})
+            ascInd = false
+        }   
+    }
+    currSort = header
+    updateTable()
+}
 /**
  * Updates the table contents with a row for each element in the global variable tableElements.
  *
@@ -202,12 +286,8 @@ function updateTable() {
         .remove()
 
     tr = d3.select("#matchTable").select("tbody").selectAll("tr").data(tableElements)  
-        // .exit()
-        // .remove()
         .enter()
         .append('tr')
-
-    // tr = d3.select("#matchTable").select("tbody").selectAll("tr").data(tableElements)
 
     var td = tr.selectAll("td")
         .data( function (d) {
@@ -345,8 +425,7 @@ function updateTable() {
             return d.value["Delta Goals"] != 0
         })
         .append("circle")
-        .attr("class", function (d) {console.log(d.type + "GoalsConceded") 
-            return d.type + "GoalsConceded"})
+        .attr("class", function (d) {return d.type + "GoalsConceded"})
         .classed("goalCircle", true)
         .attr("cx", function (d) {
             return goalScale(d.value["Goals Conceded"])
@@ -381,7 +460,7 @@ function collapseList() {
 
     // ******* TODO: PART IV *******
     var i = 0
-    while (i < tableElements.length - 1) {
+    while (i < tableElements.length) {
         if (tableElements[i].value.type == "game") {tableElements.splice(i, 1)}
         else {i++}
     }
@@ -397,14 +476,16 @@ function updateList(d,i) {
     // ******* TODO: PART IV *******
 
     if (d.value.type == "aggregate") {
-        while ((selectedRow < tableElements.length - 1) && (tableElements[selectedRow + 1].value.type == "game")) {
-            tableElements.splice(selectedRow + 1, 1)
-            if (selectedRow < i) {i--;}
+        if ((i < tableElements.length - 1) && (tableElements[i + 1].value.type == "game")) {
+            while ((i < tableElements.length - 1) && (tableElements[i + 1].value.type == "game")) {
+                tableElements.splice(i + 1, 1)
+            }
         }
-        for (game in d.value.games) {
-            tableElements.splice(i+1, 0, d.value.games[game])
+        else {
+            for (game in d.value.games) {
+                tableElements.splice(i+1, 0, d.value.games[game])
+            }
         }
-        selectedRow = i;
     }
     updateTable()
 
