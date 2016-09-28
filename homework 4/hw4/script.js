@@ -14,6 +14,10 @@ var cellWidth = 70,
     cellBuffer = 15,
     barHeight = 20;
 
+/** Other sizing variables **/
+var circleRadius = 5
+    
+
 /**Set variables for commonly accessed data columns*/
 var goalsMadeHeader = 'Goals Made',
     goalsConcededHeader = 'Goals Conceded';
@@ -141,6 +145,7 @@ d3.csv("data/fifa-tree.csv", function (error, csvData) {
     });
 
     createTree(csvData);
+    console.log(csvData)
 });
 
 /**
@@ -377,15 +382,14 @@ function updateTable() {
             return d.vis == 'goals'
         })
         .append("svg")
-            .attr("width", 2 * cellWidth)
+            .attr("width", cellWidth*2)
             .attr("height", cellHeight)
 
     td_delta_goals = td_goals     
         .append("rect")
         .classed("goalBar", true)
         .attr("fill", function (d) {
-            if (d.value["Delta Goals"] > 0) {return "#6594b0"}
-            else {return "#e27375"}                
+            return goalColorScale(d.value["Delta Goals"])              
         })
         .attr("x", function (d) {
             if (d.value["Goals Conceded"] < d.value["Goals Made"]) {
@@ -445,10 +449,6 @@ function updateTable() {
         .attr("cy", 10)
 
     tr.on("click", updateList)
-
-    logo = d3.select("#logo")
-
-    logo.on("click", collapseList)
 };
 
 
@@ -499,8 +499,80 @@ function updateList(d,i) {
 function createTree(treeData) {
 
     // ******* TODO: PART VI *******
+    //console.log(function (d) {console.log(d.id)})
+
+    // var tree = d3.selectAll(".class").select("#tree").data(treeData)
+    //     .attr("width", function (d) {console.log(d.id); return d.id})
+    console.log(treeData)
+    var root = d3.stratify() 
+        .id(function(d) { console.log(d.id); return d.id; }) 
+        .parentId(function(d) { 
+            if (d.ParentGame != '') {return treeData[d.ParentGame].id; }
+        }) 
+        (treeData);
 
 
+    const tree = d3.tree()
+        .size([850, 300])
+
+    tree(root);
+
+    var treeLayout = d3.selectAll(".view").select("#tree")
+        .attr("transform", "translate(100,0)");
+
+    var link = treeLayout.selectAll(".link")
+        .data(root.descendants().slice(1))
+        .enter()
+        .append("path")
+        .classed("link", true)
+        .attr("d", function(d) {
+            return "M" + d.y + "," + d.x
+             + "C" + (d.y + d.parent.y) / 2 + "," + d.x
+             + " " + (d.y + d.parent.y) / 2 + "," + d.parent.x
+             + " " + d.parent.y + "," + d.parent.x;
+            });
+
+    var node = treeLayout.selectAll(".node")
+        .data(root.descendants())
+        .enter()
+        .append("g")
+        .attr("class", function(d) { 
+            if (d.data.Wins == 1) {console.log(d); return "winner"}
+        })
+        .classed("node", true)
+        .attr("transform", function(d) { 
+            return "translate(" + d.y + "," + d.x + ")"; });
+
+    node.append("circle")
+        .attr("r", circleRadius)
+
+    node.append("text")
+        .attr("dy", 3)
+        .style("text-anchor", function(d) { 
+            return d.children ? "end" : "start"; })
+        .text(function (d) {return d.data.Team})
+        .attr("x", function(d) { return d.children ? -13 : 13; })
+
+
+      // .text(function(d) { 
+      //   return d.data.name;
+      // });
+
+    // var links = 
+    // console.log(root)
+    // var tree = d3.tree(root)
+    // var nodes = tree.nodes()
+    // console.log(nodes)
+    // var nodes = tree.nodes(root).reverse(),
+    // links = tree.links(nodes);
+    // var tree = d3.selectAll(".class").select("#tree")
+    // var diagonal = d3.svg.diagonal()
+    //     .source({x: 10, y: 10})
+    //     .target({x: 300, y: 300})
+
+    // tree.append("path")
+    //     .classed("link", true)
+    //     .attr("d", diagonal)
 };
 
 /**
