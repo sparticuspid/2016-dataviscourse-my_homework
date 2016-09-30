@@ -52,7 +52,6 @@ function updateBarChart(selectedDimension) {
     var xAxisGroup = d3.select('#xAxis')
         .attr("transform", "translate("  + (textWidth + padding) + ", " + (height - padding - textWidth) +")")
 
-
     // create a new axis that has the ticks and labels on the bottom
     var xAxis = d3.axisBottom()
     // assign the scale to the axis
@@ -131,6 +130,7 @@ function barClickEvent(d) {
 
 function countryClickEvent(d) { 
 
+    console.log(allWorldCupData)
     selectedCountry = this.id
 
     updateProfile(d)

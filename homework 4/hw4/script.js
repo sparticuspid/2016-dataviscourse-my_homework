@@ -42,8 +42,8 @@ var goalColorScale = d3.scaleQuantize()
 
 /**json Object to convert between rounds/results and ranking value*/
 var rank = {
-    "Winner": 7,
-    "Runner-Up": 6,
+    'Winner': 7,
+    'Runner-Up': 6,
     'Third Place': 5,
     'Fourth Place': 4,
     'Semi Finals': 3,
@@ -53,8 +53,8 @@ var rank = {
 };
 
 var rev_rank = {
-    7: "Winner",
-    6: "Runner-Up",
+    7: 'Winner',
+    6: 'Runner-Up',
     5: 'Third Place',
     4: 'Fourth Place',
     3: 'Semi Finals',
@@ -80,7 +80,7 @@ var rev_rank = {
 //  *
 //  */
 
-d3.csv("data/fifa-matches.csv", function (error, csvData) {
+d3.csv('data/fifa-matches.csv', function (error, csvData) {
 
    // ******* TODO: PART I *******
     teamData = d3.nest()
@@ -89,36 +89,36 @@ d3.csv("data/fifa-matches.csv", function (error, csvData) {
     })
     .rollup(function (leaves) {
         return {
-            "Wins": d3.sum(leaves,function(d){return d.Wins}),
-            "Losses": d3.sum(leaves,function(d){return d.Losses}),
-            "Goals Made": d3.sum(leaves,function(d){return d[goalsMadeHeader]}),
-            "Goals Conceded": d3.sum(leaves,function(d){return d[goalsConcededHeader]}),
-            "Delta Goals": d3.sum(leaves,function(d){return d["Delta Goals"]}),
-            "TotalGames": leaves.length,
-            "Result":  {
-                "label": rev_rank[d3.max(leaves,function(d){return rank[d.Result]})],
-                "ranking": d3.max(leaves,function(d){return rank[d.Result]})
+            'Wins': d3.sum(leaves,function(d){return d.Wins}),
+            'Losses': d3.sum(leaves,function(d){return d.Losses}),
+            'Goals Made': d3.sum(leaves,function(d){return d[goalsMadeHeader]}),
+            'Goals Conceded': d3.sum(leaves,function(d){return d[goalsConcededHeader]}),
+            'Delta Goals': d3.sum(leaves,function(d){return d['Delta Goals']}),
+            'TotalGames': leaves.length,
+            'Result':  {
+                'label': rev_rank[d3.max(leaves,function(d){return rank[d.Result]})],
+                'ranking': d3.max(leaves,function(d){return rank[d.Result]})
             }, 
-            "type": "aggregate",
-            "games": 
+            'type': 'aggregate',
+            'games': 
                 d3.nest()
                     .key(function (games) {
                         return games.Opponent;
                     })
                     .rollup(function(games) {
                         return {
-                            "Wins": [], //d3.sum(games,function(d){return d.Wins}),
-                            "Losses": [], //d3.sum(games,function(d){return d.Losses}),
-                            "TotalGames": [],
-                            "Goals Made": d3.sum(games,function(d){return d[goalsMadeHeader]}),
-                            "Goals Conceded": d3.sum(games,function(d){return d[goalsConcededHeader]}),
-                            "Delta Goals": d3.sum(games,function(d){return d["Delta Goals"]}),
-                            "Result":  {
-                                "label": rev_rank[d3.max(games,function(d){return rank[d.Result]})],
-                                "ranking": d3.max(games,function(d){return rank[d.Result]})
+                            'Wins': [], //d3.sum(games,function(d){return d.Wins}),
+                            'Losses': [], //d3.sum(games,function(d){return d.Losses}),
+                            'TotalGames': [],
+                            'Goals Made': d3.sum(games,function(d){return d[goalsMadeHeader]}),
+                            'Goals Conceded': d3.sum(games,function(d){return d[goalsConcededHeader]}),
+                            'Delta Goals': d3.sum(games,function(d){return d['Delta Goals']}),
+                            'Result':  {
+                                'label': rev_rank[d3.max(games,function(d){return rank[d.Result]})],
+                                'ranking': d3.max(games,function(d){return rank[d.Result]})
                             }, 
-                            "type": "game",
-                            "Opponent": d3.max(games,function(d){return d.Team}),
+                            'type': 'game',
+                            'Opponent': d3.max(games,function(d){return d.Team}),
                         }
                     })
                     .entries(leaves)
@@ -137,15 +137,14 @@ d3.csv("data/fifa-matches.csv", function (error, csvData) {
  * Loads in the tree information from fifa-tree.csv and calls createTree(csvData) to render the tree.
  *
  */
-d3.csv("data/fifa-tree.csv", function (error, csvData) {
+d3.csv('data/fifa-tree.csv', function (error, csvData) {
 
-    //Create a unique "id" field for each game
+    //Create a unique 'id' field for each game
     csvData.forEach(function (d, i) {
         d.id = d.Team + d.Opponent + i;
     });
 
     createTree(csvData);
-    console.log(csvData)
 });
 
 /**
@@ -160,22 +159,22 @@ function createTable() {
     // ********* Add x-axis to Goals Column header **************
 
     var tickCount = d3.max(teamData, function (d, i) {    
-                return d.value["Goals Made"]})/2;
+                return d.value['Goals Made']})/2;
 
     goalScale
         .domain([0, d3.max(teamData, function (d, i) {    
-            return d.value["Goals Made"];
+            return d.value['Goals Made'];
         })])
 
-    var goalAxis = d3.select("#goalHeader")
-        .append("svg")
-        .attr("id", "goal-Axis")
-        .attr("width", cellWidth * 2)
-        .attr("height", cellHeight + cellBuffer)
+    var goalAxis = d3.select('#goalHeader')
+        .append('svg')
+        .attr('id', 'goal-Axis')
+        .attr('width', cellWidth * 2)
+        .attr('height', cellHeight + cellBuffer)
 
-    var goalAxisGroup = d3.select("#goalHeader").select('#goal-Axis')
-        .append("g")
-        .attr("transform", "translate(0,20)")
+    var goalAxisGroup = d3.select('#goalHeader').select('#goal-Axis')
+        .append('g')
+        .attr('transform', 'translate(0,20)')
 
 
     // create a new axis that has the ticks and labels on the top
@@ -194,11 +193,12 @@ function createTable() {
 
     // ******* TODO: PART V *******
 
-    header = d3.select("#matchTable").select("thead").selectAll("tr").selectAll("td")
-        .on("click", sort)
+    header = d3.select('#matchTable').select('thead').selectAll('tr').selectAll('td')
+        .on('click', sort)
 
-    teamHeader = d3.select("#matchTable").select("thead").selectAll("tr").selectAll("th")
-        .on("click", sort)
+    teamHeader = d3.select('#matchTable').select('thead').selectAll('tr').selectAll('th')
+        .on('click', sort)
+
 }
 
 function sort() {
@@ -218,11 +218,11 @@ function sort() {
     }   
     if (header == ' Goals ') {
         if ((currSort == header) && (ascInd == false))   {
-            tableElements = tableElements.sort(function (a,b) {return d3.ascending(a.value["Delta Goals"], b.value["Delta Goals"])})
+            tableElements = tableElements.sort(function (a,b) {return d3.ascending(a.value['Delta Goals'], b.value['Delta Goals'])})
             ascInd = true
         }
         else {
-            tableElements = tableElements.sort(function (a,b) {return d3.descending(a.value["Delta Goals"], b.value["Delta Goals"])})
+            tableElements = tableElements.sort(function (a,b) {return d3.descending(a.value['Delta Goals'], b.value['Delta Goals'])})
             ascInd = false
         }
     }
@@ -279,176 +279,184 @@ function updateTable() {
 
     goalScale
         .domain([0, d3.max(teamData, function (d, i) {    
-            return d.value["Goals Made"];
+            return d.value['Goals Made'];
         })])
 
     gameScale
         .domain([0, d3.max(teamData, function (d, i) {    
-            return d.value["TotalGames"];
+            return d.value['TotalGames'];
         })])
 
-    d3.select("#matchTable").select("tbody").selectAll("tr")
+    d3.select('#matchTable').select('tbody').selectAll('tr')
         .remove()
 
-    tr = d3.select("#matchTable").select("tbody").selectAll("tr").data(tableElements)  
-        .enter()
+    tr = d3.select('#matchTable').select('tbody').selectAll('tr').data(tableElements)  
+        .enter()    
         .append('tr')
 
-    var td = tr.selectAll("td")
+    var td = tr.selectAll('td')
         .data( function (d) {
-        return [{"type": d.value["type"], "vis": "team", "value": d.key},
-                {"type": d.value["type"], "vis": "goals", "value": {
-                    "Goals Made": d.value["Goals Made"],
-                    "Goals Conceded": d.value["Goals Conceded"],
-                    "Delta Goals": d.value["Delta Goals"]}
+        return [{'type': d.value['type'], 'vis': 'team', 'value': d.key},
+                {'type': d.value['type'], 'vis': 'goals', 'value': {
+                    'Goals Made': d.value['Goals Made'],
+                    'Goals Conceded': d.value['Goals Conceded'],
+                    'Delta Goals': d.value['Delta Goals']}
                 },
-                {"type": d.value["type"], "vis": "result", "value": d.value.Result["label"]},
-                {"type": d.value["type"], "vis": "bars", "value": d.value["Wins"]},
-                {"type": d.value["type"], "vis": "bars", "value": d.value["Losses"]},
-                {"type": d.value["type"], "vis": "bars", "value": d.value["TotalGames"]}]
+                {'type': d.value['type'], 'vis': 'result', 'value': d.value.Result['label']},
+                {'type': d.value['type'], 'vis': 'bars', 'value': d.value['Wins']},
+                {'type': d.value['type'], 'vis': 'bars', 'value': d.value['Losses']},
+                {'type': d.value['type'], 'vis': 'bars', 'value': d.value['TotalGames']}]
 
         })  
 
     td
         .enter()
-        .append("td")
-        .style("padding-left", 0)
+        .append('td')
+        .style('padding-left', 0)
 
     aggregateColorScale
         .domain([0, d3.max(teamData, function (d, i) {    
-            return d.value["TotalGames"];
+            return d.value['TotalGames'];
         })])
 
-    td_bars = d3.select("#matchTable").select("tbody").selectAll("td")
+    td_bars = d3.select('#matchTable').select('tbody').selectAll('td')
         .filter(function (d) {
             return d.vis == 'bars'
         })
-        .append("svg")
-            .attr("width", cellWidth + cellBuffer)
-            .attr("height", cellHeight)
-            .append("g")
+        .append('svg')
+            .attr('width', cellWidth + cellBuffer)
+            .attr('height', cellHeight)
+            .append('g')
 
     td_bars_rect = td_bars
-        .append("rect")
-        .attr("width", function (d) {
+        .append('rect')
+        .attr('width', function (d) {
             return gameScale(d.value)
         })
-        .attr("height", barHeight)
+        .attr('height', barHeight)
         .attr('fill', function (d) {
             return aggregateColorScale(d.value);
         })
 
     td_bars_text = td_bars
-        .append("text")
-        .attr("width", function (d) {
+        .append('text')
+        .attr('width', function (d) {
             return gameScale(d.value)
         })
-        .attr("x", function (d) {
+        .attr('x', function (d) {
             return Math.max(0,gameScale(d.value) - 10)
         })
-        .attr("y", cellBuffer)
-        .attr("fill", "white")
+        .attr('y', cellBuffer)
+        .attr('fill', 'white')
         .text(function (d) {
             return d.value
         })
 
-    td_team = d3.select("#matchTable").select("tbody").selectAll("td")
+    td_team = d3.select('#matchTable').select('tbody').selectAll('td')
         .filter(function (d) {
             return d.vis == 'team'
         })
-        .attr("width", cellWidth*5)
-        .attr("class", function (d) {return d.type + "TeamName"})
+        .attr('width', cellWidth*5)
+        .attr('class', function (d) {return d.type + 'TeamName'})
         .text(function (d) {
-            if (d.type == "game") {return "x" + d.value}
+            if (d.type == 'game') {return 'x' + d.value}
             else {return d.value}
         })
 
-    td_result = d3.select("#matchTable").select("tbody").selectAll("td")
+    td_result = d3.select('#matchTable').select('tbody').selectAll('td')
         .filter(function (d) {
             return d.vis == 'result'
         })
-        .append("svg")
-            .attr("width", cellWidth*2)
-            .attr("height", cellHeight)
-            .append("text")
+        .append('svg')
+            .attr('width', cellWidth*2)
+            .attr('height', cellHeight)
+            .append('text')
             .text(function (d) {
                 return d.value
             })
-            .attr("y", cellBuffer)
-            .attr("x", 5)
+            .attr('y', cellBuffer)
+            .attr('x', 5)
 
-    td_goals = d3.select("#matchTable").select("tbody").selectAll("td")
+    td_goals = d3.select('#matchTable').select('tbody').selectAll('td')
         .filter(function (d) {
             return d.vis == 'goals'
         })
-        .append("svg")
-            .attr("width", cellWidth*2)
-            .attr("height", cellHeight)
+        .append('svg')
+            .attr('width', cellWidth*2)
+            .attr('height', cellHeight)
 
     td_delta_goals = td_goals     
-        .append("rect")
-        .classed("goalBar", true)
-        .attr("fill", function (d) {
-            return goalColorScale(d.value["Delta Goals"])              
+        .append('rect')
+        .classed('goalBar', true)
+        .attr('fill', function (d) {
+            return goalColorScale(d.value['Delta Goals'])              
         })
-        .attr("x", function (d) {
-            if (d.value["Goals Conceded"] < d.value["Goals Made"]) {
-                return goalScale(d.value["Goals Conceded"])
+        .attr('x', function (d) {
+            if (d.value['Goals Conceded'] < d.value['Goals Made']) {
+                return goalScale(d.value['Goals Conceded'])
             }
-            else {return goalScale(d.value["Goals Made"])}
+            else {return goalScale(d.value['Goals Made'])}
         })
-        .attr("width", function (d) {
-            if (d.value["Goals Conceded"] > d.value["Goals Made"]) {
-                return goalScale(d.value["Goals Conceded"]) - goalScale(d.value["Goals Made"])
+        .attr('width', function (d) {
+            if (d.value['Goals Conceded'] > d.value['Goals Made']) {
+                return goalScale(d.value['Goals Conceded']) - goalScale(d.value['Goals Made'])
             }
-            else {return goalScale(d.value["Goals Made"]) - goalScale(d.value["Goals Conceded"])}    
+            else {return goalScale(d.value['Goals Made']) - goalScale(d.value['Goals Conceded'])}    
         })
-        .attr("height", function (d) {
-            if (d.type == "aggregate") {return 10}
+        .attr('height', function (d) {
+            if (d.type == 'aggregate') {return 10}
             else {return 5} 
         })
-        .attr("y", function (d) {
-            if (d.type == "aggregate") {return 5}
+        .attr('y', function (d) {
+            if (d.type == 'aggregate') {return 5}
             else {return 8} 
         })
 
     td_goals_made = td_goals
         .filter(function (d) {
-            return d.value["Delta Goals"] != 0
+            return d.value['Delta Goals'] != 0
         })
-        .append("circle")
-        .attr("class", function (d) {return d.type + "GoalsMade"})
-        .classed("goalCircle", true)
-        .attr("cx", function (d) {
-            return goalScale(d.value["Goals Made"])
+        .append('circle')
+        .attr('class', function (d) {return d.type + 'GoalsMade'})
+        .classed('goalCircle', true)
+        .attr('cx', function (d) {
+            return goalScale(d.value['Goals Made'])
         })
-        .attr("cy", 10)
+        .attr('cy', 10)
 
     td_goals_conceded = td_goals
         .filter(function (d) {
-            return d.value["Delta Goals"] != 0
+            return d.value['Delta Goals'] != 0
         })
-        .append("circle")
-        .attr("class", function (d) {return d.type + "GoalsConceded"})
-        .classed("goalCircle", true)
-        .attr("cx", function (d) {
-            return goalScale(d.value["Goals Conceded"])
+        .append('circle')
+        .attr('class', function (d) {return d.type + 'GoalsConceded'})
+        .classed('goalCircle', true)
+        .attr('cx', function (d) {
+            return goalScale(d.value['Goals Conceded'])
         })
-        .attr("cy", 10)
+        .attr('cy', 10)
 
     td_goals_equal = td_goals
         .filter(function (d) {
-            return d.value["Delta Goals"] == 0
+            return d.value['Delta Goals'] == 0
         })
-        .append("circle")
-        .attr("class", function (d) {return d.type + "GoalsEqual"})
-        .classed("goalCircle", true)
-        .attr("cx", function (d) {
-            return goalScale(d.value["Goals Conceded"])
+        .append('circle')
+        .attr('class', function (d) {return d.type + 'GoalsEqual'})
+        .classed('goalCircle', true)
+        .attr('cx', function (d) {
+            return goalScale(d.value['Goals Conceded'])
         })
-        .attr("cy", 10)
+        .attr('cy', 10)
 
-    tr.on("click", updateList)
+    // teamRow = d3.select('#matchTable').select('tbody').selectAll('tr')
+
+    // teamRow.on('mouseenter', updateTree())
+
+    tr.on('click', updateList)
+    tr.on('mouseenter', updateTree)
+    tr.on('mouseleave', clearTree)
+
+
 };
 
 
@@ -461,7 +469,7 @@ function collapseList() {
     // ******* TODO: PART IV *******
     var i = 0
     while (i < tableElements.length) {
-        if (tableElements[i].value.type == "game") {tableElements.splice(i, 1)}
+        if (tableElements[i].value.type == 'game') {tableElements.splice(i, 1)}
         else {i++}
     }
     updateTable()
@@ -475,9 +483,9 @@ function updateList(d,i) {
 
     // ******* TODO: PART IV *******
 
-    if (d.value.type == "aggregate") {
-        if ((i < tableElements.length - 1) && (tableElements[i + 1].value.type == "game")) {
-            while ((i < tableElements.length - 1) && (tableElements[i + 1].value.type == "game")) {
+    if (d.value.type == 'aggregate') {
+        if ((i < tableElements.length - 1) && (tableElements[i + 1].value.type == 'game')) {
+            while ((i < tableElements.length - 1) && (tableElements[i + 1].value.type == 'game')) {
                 tableElements.splice(i + 1, 1)
             }
         }
@@ -499,13 +507,9 @@ function updateList(d,i) {
 function createTree(treeData) {
 
     // ******* TODO: PART VI *******
-    //console.log(function (d) {console.log(d.id)})
 
-    // var tree = d3.selectAll(".class").select("#tree").data(treeData)
-    //     .attr("width", function (d) {console.log(d.id); return d.id})
-    console.log(treeData)
     var root = d3.stratify() 
-        .id(function(d) { console.log(d.id); return d.id; }) 
+        .id(function(d) {return d.id}) 
         .parentId(function(d) { 
             if (d.ParentGame != '') {return treeData[d.ParentGame].id; }
         }) 
@@ -517,62 +521,42 @@ function createTree(treeData) {
 
     tree(root);
 
-    var treeLayout = d3.selectAll(".view").select("#tree")
-        .attr("transform", "translate(100,0)");
+    var treeLayout = d3.selectAll('.view').select('#tree')
+        .attr('transform', 'translate(100,0)');
 
-    var link = treeLayout.selectAll(".link")
+    var link = treeLayout.selectAll('.link')
         .data(root.descendants().slice(1))
         .enter()
-        .append("path")
-        .classed("link", true)
-        .attr("d", function(d) {
-            return "M" + d.y + "," + d.x
-             + "C" + (d.y + d.parent.y) / 2 + "," + d.x
-             + " " + (d.y + d.parent.y) / 2 + "," + d.parent.x
-             + " " + d.parent.y + "," + d.parent.x;
+        .append('path')
+        .classed('link', true)
+        .attr('d', function(d) {
+            return 'M' + d.y + ',' + d.x
+             + 'C' + (d.y + d.parent.y) / 2 + ',' + d.x
+             + ' ' + (d.y + d.parent.y) / 2 + ',' + d.parent.x
+             + ' ' + d.parent.y + ',' + d.parent.x;
             });
 
-    var node = treeLayout.selectAll(".node")
+    var node = treeLayout.selectAll('.node')
         .data(root.descendants())
         .enter()
-        .append("g")
-        .attr("class", function(d) { 
-            if (d.data.Wins == 1) {console.log(d); return "winner"}
+        .append('g')
+        .attr('class', function(d) { 
+            if (d.data.Wins == 1) {return 'winner'}
         })
-        .classed("node", true)
-        .attr("transform", function(d) { 
-            return "translate(" + d.y + "," + d.x + ")"; });
+        .classed('node', true)
+        .attr('transform', function(d) { 
+            return 'translate(' + d.y + ',' + d.x + ')'; });
 
-    node.append("circle")
-        .attr("r", circleRadius)
+    node.append('circle')
+        .attr('r', circleRadius)
 
-    node.append("text")
-        .attr("dy", 3)
-        .style("text-anchor", function(d) { 
-            return d.children ? "end" : "start"; })
+    node.append('text')
+        .attr('dy', 3)
+        .style('text-anchor', function(d) { 
+            return d.children ? 'end' : 'start'; })
         .text(function (d) {return d.data.Team})
-        .attr("x", function(d) { return d.children ? -13 : 13; })
+        .attr('x', function(d) { return d.children ? -13 : 13; })
 
-
-      // .text(function(d) { 
-      //   return d.data.name;
-      // });
-
-    // var links = 
-    // console.log(root)
-    // var tree = d3.tree(root)
-    // var nodes = tree.nodes()
-    // console.log(nodes)
-    // var nodes = tree.nodes(root).reverse(),
-    // links = tree.links(nodes);
-    // var tree = d3.selectAll(".class").select("#tree")
-    // var diagonal = d3.svg.diagonal()
-    //     .source({x: 10, y: 10})
-    //     .target({x: 300, y: 300})
-
-    // tree.append("path")
-    //     .classed("link", true)
-    //     .attr("d", diagonal)
 };
 
 /**
@@ -584,7 +568,29 @@ function createTree(treeData) {
 function updateTree(row) {
 
     // ******* TODO: PART VII *******
+    selection = d3.select(this).data()
+    selectedTeam = selection[0].key
+    selectedOpponent = selection[0].value.Opponent
+    selectedType = selection[0].value.type
 
+
+    var link = d3.selectAll('.view').select('#tree').selectAll('.link')
+        .filter(function (d) {
+            console.log(d)
+            if (selectedType == 'aggregate') {return ((d.data.Team == selectedTeam) && (d.data.Wins == 1))}
+            else {return (((d.data.Team == selectedTeam) && (d.data.Opponent == selectedOpponent))
+                || ((d.data.Team == selectedOpponent) && (d.data.Opponent == selectedTeam)))}
+
+        })
+        .classed("selected", true)
+
+    var node = d3.selectAll('.view').select('#tree').selectAll('.node').selectAll('text')
+        .filter(function (d) {
+            if (selectedType == 'aggregate') {return (d.data.Team == selectedTeam)}
+            else {return (((d.data.Team == selectedTeam) && (d.data.Opponent == selectedOpponent))
+                || ((d.data.Team == selectedOpponent) && (d.data.Opponent == selectedTeam)))}
+        })
+        .classed("selectedLabel", true)
 
 }
 
@@ -594,8 +600,12 @@ function updateTree(row) {
 function clearTree() {
 
     // ******* TODO: PART VII *******
-    
 
+    var link = d3.selectAll('.view').select('#tree').selectAll('.link')
+        .classed("selected", false)
+
+    var node = d3.selectAll('.view').select('#tree').selectAll('.node').selectAll('text')
+        .classed("selectedLabel", false)
 }
 
 
