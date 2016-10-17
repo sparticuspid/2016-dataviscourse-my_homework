@@ -130,7 +130,6 @@ function barClickEvent(d) {
 
 function countryClickEvent(d) { 
 
-    console.log(allWorldCupData)
     selectedCountry = this.id
 
     updateProfile(d)

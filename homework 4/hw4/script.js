@@ -126,7 +126,6 @@ d3.csv('data/fifa-matches.csv', function (error, csvData) {
     })
     .entries(csvData);
 
-    console.log(teamData)
     createTable();
     updateTable();
 });
@@ -576,7 +575,6 @@ function updateTree(row) {
 
     var link = d3.selectAll('.view').select('#tree').selectAll('.link')
         .filter(function (d) {
-            console.log(d)
             if (selectedType == 'aggregate') {return ((d.data.Team == selectedTeam) && (d.data.Wins == 1))}
             else {return (((d.data.Team == selectedTeam) && (d.data.Opponent == selectedOpponent))
                 || ((d.data.Team == selectedOpponent) && (d.data.Opponent == selectedTeam)))}
