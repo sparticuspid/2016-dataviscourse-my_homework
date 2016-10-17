@@ -36,6 +36,8 @@ YearChart.prototype.init = function(){
         .attr("width",self.svgWidth)
         .attr("height",self.svgHeight)
 
+    self.circleRadius = 15;
+    self.yCenter = 20;
 };
 
 /**
@@ -80,14 +82,46 @@ YearChart.prototype.update = function(){
     //HINT: Use the .yearChart class to style your circle elements
     //HINT: Use the chooseClass method to choose the color corresponding to the winning party.
 
+    console.log(self.electionWinners)
+    
+    var yearScale = d3.scaleLinear()
+        .range([self.margin.left, self.svgWidth])
+        .domain([0, self.electionWinners.length])
+
+    svg = d3.select("#year-chart").select('svg')
+
+    years = svg.selectAll('circle').data(self.electionWinners)
+        .enter()
+        .append('circle')
+        .attr('class', function (d) {return YearChart.prototype.chooseClass(d.PARTY)})
+        .attr('r', self.circleRadius)
+        .attr('cx', function (d, i) {return yearScale(i)})
+        .attr('cy', self.yCenter)
+
+
     //Append text information of each year right below the corresponding circle
     //HINT: Use .yeartext class to style your text elements
+
+    svg.selectAll('text').data(self.electionWinners)
+        .enter()
+        .append('text')
+        .classed('yeartext', true)
+        .text(function (d) {return d.YEAR})
+        .attr('x', function (d, i) {return yearScale(i)})
+        .attr('y', self.yCenter + self.circleRadius + 25)
 
     //Style the chart by adding a dashed line that connects all these years.
     //HINT: Use .lineChart to style this dashed line
 
+    svg.append('line')
+        .attr('class', 'tile')
+        .attr('y', 30)
+        .attr('x', 40)
+
     //Clicking on any specific year should highlight that circle and  update the rest of the visualizations
     //HINT: Use .highlighted class to style the highlighted circle
+
+    years.on("click", yearClickEvent)
 
     //Election information corresponding to that year should be loaded and passed to
     // the update methods of other visualizations
@@ -99,4 +133,14 @@ YearChart.prototype.update = function(){
     //Implement a call back method to handle the brush end event.
     //Call the update method of shiftChart and pass the data corresponding to brush selection.
     //HINT: Use the .brush class to style the brush.
+}
+
+function yearClickEvent(d) {
+
+    d3.select('#year-chart').select('svg').selectAll('circle')
+        .classed('highlighted', false);
+
+    d3.select(this)
+        .classed('highlighted', true)
+   
 };

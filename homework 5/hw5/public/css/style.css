@@ -36,6 +36,7 @@ h1 {
 .electoralVoteText, .votesPercentageText{
     font-size: 35px;
 }
+
 .end{
     text-anchor:end;
 }
@@ -43,6 +44,7 @@ h1 {
 .nomineeInfoText{
     font-size: 36px;
 }
+
 .Axis{
     stroke: #eee;
     stroke-width: 4;
