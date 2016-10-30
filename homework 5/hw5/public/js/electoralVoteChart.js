@@ -5,11 +5,10 @@
  * @param shiftChart an instance of the ShiftChart class
  */
 function ElectoralVoteChart(shiftChart){
-
     var self = this;
     self.shiftChart = shiftChart;
-
     self.init();
+
 };
 
 /**
@@ -24,8 +23,9 @@ ElectoralVoteChart.prototype.init = function(){
     self.svgBounds = divelectoralVotes.node().getBoundingClientRect();
     self.svgWidth = self.svgBounds.width - self.margin.left - self.margin.right;
     self.svgHeight = 150;
-    self.textPostion = 40;
-    self.chartPosition = 50;
+    self.textPostion = 45;
+    self.chartPosition = 55;
+    self.chartHeight = 25;
 
     //creates svg element within the div
     self.svg = divelectoralVotes.append("svg")
@@ -59,45 +59,61 @@ ElectoralVoteChart.prototype.chooseClass = function (party) {
  */
 
 ElectoralVoteChart.prototype.update = function(electionResult, colorScale){
-    var self = this;
 
+    var self = this;
+    
     var electoralScale = d3.scaleLinear()
-        .range([50, 1000])//.range([self.margin.left, self.svgWidth])
+        .range([0, self.svgWidth - self.margin.left])
         .domain([0, d3.sum(electionResult, function (d) {return d.Total_EV})])
 
-    console.log(colorScale)
     // ******* TODO: PART II *******
 
     //Group the states based on the winning party for the state;
     //then sort them based on the margin of victory
 
     var electionResult = electionResult.sort(function (a,b) { 
-        return d3.ascending(a.State_Winner, b.State_Winner) || d3.descending(a.RD_Difference, b.RD_Difference)
+        //console.log(d3.ascending(a.State_Winner, b.State_Winner) + " " +a.State_Winner + " " + b.State_Winner)
+        if (a.State_Winner == "I")
+            return -1
+        else if (b.State_Winner =="I")
+            return 1;
+        else if(a.State_Winner == b.State_Winner)
+            return  a.RD_Difference - b.RD_Difference
+        else 
+            return  d3.ascending(a.State_Winner, b.State_Winner)
     })
 
-    console.log(electionResult)
     //Create the stacked bar chart.
     //Use the global color scale to color code the rectangles.
     //HINT: Use .electoralVotes class to style your bars.
 
     var electoralVote = d3.select('#electoral-vote').select('svg')
 
-    electoralVote.selectAll('rect')
-        .remove()
-
     electoralVote.selectAll('text')
         .remove()
 
-    var bars = electoralVote.selectAll('rect').data(electionResult)
+    electoralVote.select('.brush')
+        .remove()
+
+    var bars = electoralVote.selectAll('.electoralVotes').data(electionResult)
+
+    bars
         .enter()
         .append('rect')
+        .merge(bars)
         .attr('width', function (d) {return electoralScale(d.Total_EV)})
-        .attr('x', function (d,i) {return electoralScale(d3.sum(electionResult.slice(0,i), function (d) {return d.Total_EV}))})
-        .attr('y', 50)
-        .attr('height', 25)
-        //.attr('fill', function (d) {return colorScale(d.RD_Difference)})
+        .attr('x', function (d,i) {return self.margin.left + electoralScale(d3.sum(electionResult.slice(0,i), function (d) {return d.Total_EV}))})
+        .attr('y', self.chartPosition)
+        .attr('height', self.chartHeight)
+        .attr('fill', function (d) {
+                if (d.State_Winner =="I") {return '#45AD6A'}
+                else {return colorScale(d.RD_Difference)}
+        })
         .classed('electoralVotes', true)
 
+    bars
+        .exit()
+        .remove()
 
     //Display total count of electoral votes won by the Democrat and Republican party
     //on top of the corresponding groups of bars.
@@ -106,27 +122,27 @@ ElectoralVoteChart.prototype.update = function(electionResult, colorScale){
 
     electoralVote.append('text')
         .text(d3.max(electionResult, function (d) {return d.D_EV_Total}))
-        .attr('x', electoralScale(d3.max(electionResult, function (d) {
+        .attr('x', self.margin.left + electoralScale(d3.max(electionResult, function (d) {
             if (d.I_EV_Total == '') {return 0}
             else {return d.I_EV_Total}
         })))
-        .attr('y', 40)//self.textPostion)
+        .attr('y', self.textPostion)
         .attr('width', 200)
         .attr('class', ElectoralVoteChart.prototype.chooseClass('D'))
         .classed('electoralVoteText', true)
 
     electoralVote.append('text')
         .text(d3.max(electionResult, function (d) {return d.R_EV_Total}))
-        .attr('x', 1000)
-        .attr('y', 40)//self.textPostion)
+        .attr('x', self.svgWidth)
+        .attr('y', self.textPostion)
         .attr('width', 200)
         .attr('class', ElectoralVoteChart.prototype.chooseClass('R'))
         .classed('electoralVoteText', true)
 
     electoralVote.append('text')
         .text(d3.max(electionResult, function (d) {return d.I_EV_Total}))
-        .attr('x', 50)
-        .attr('y', 40)//self.textPostion)
+        .attr('x', self.margin.left)
+        .attr('y', self.textPostion)
         .attr('width', 200)
         .attr('class', ElectoralVoteChart.prototype.chooseClass('I'))
         .classed('electoralVoteText', true)
@@ -134,11 +150,11 @@ ElectoralVoteChart.prototype.update = function(electionResult, colorScale){
     //Display a bar with minimal width in the center of the bar chart to indicate the 50% mark
     //HINT: Use .middlePoint class to style this bar.
 
-    electoralVote.append('line')
-        .attr("x1", 500)//self.svgWidth/2)
-        .attr("y1", 25)
-        .attr("x2", 500)//self.svgWidth/2)
-        .attr("y2", 60)
+    electoralVote.append('rect')
+        .attr("width", 2)
+        .attr("height", 35)
+        .attr("x", (self.margin.left + self.svgWidth)/2)
+        .attr("y", 50)
         .classed('middlePoint', true)
 
     // electoralVote.append('text')
@@ -146,11 +162,11 @@ ElectoralVoteChart.prototype.update = function(electionResult, colorScale){
     // to win the elections throughout the country
     //HINT: Use .electoralVotesNote class to style this text element
 
-    electoralVote.append('text')
-        .text('Electoral Vote (270 needed to win)')
+    electoralVote.append('text')    
+        .text('Electoral Vote (' + Math.round((d3.sum(electionResult, function (d) {return d.Total_EV})/2 + .5)) + ' needed to win)')
         .classed('electoralVotesNote', true)
-        .attr('x', 500)//self.svgWidth/2)
-        .attr('y', 40)//self.textPostion)
+        .attr('x', (self.margin.left + self.svgWidth)/2)
+        .attr('y', self.textPostion - 5)
         .attr('width', 200)
 
     //HINT: Use the chooseClass method to style your elements based on party wherever necessary.
@@ -159,6 +175,31 @@ ElectoralVoteChart.prototype.update = function(electionResult, colorScale){
     //Implement brush on the bar chart created above.
     //Implement a call back method to handle the brush end event.
     //Call the update method of shiftChart and pass the data corresponding to brush selection.
-    //HINT: Use the .brush class to style the brush.
+    //HINT: Use the .brush class to style the brush.        
 
+    // var brush = d3.brushX().extent([<minX>,<minY>],[<maxX>,<maxY>]).on("end", brushed);
+    var brush = d3.brushX().extent([[self.margin.left,self.chartPosition - 10],[self.svgWidth,self.chartPosition + self.chartHeight + 10]])
+
+    electoralVote.append("g").attr("class", "brush").call(brush);
+
+    brush
+        .on("end", function(d){ self.brushed(d)})
+}
+
+ElectoralVoteChart.prototype.brushed = function(d) {
+    var self = this;
+    var selectionCoordinates = d3.event.selection
+    var selectedStatesList = []
+    var bars = d3.select('#electoral-vote').select('svg').selectAll('.electoralVotes')
+
+    bars
+        .each(function(d,i) {
+            var x = +d3.select(this).attr('x')
+            var width = +d3.select(this).attr('width')
+            if ((+selectionCoordinates[0] <= x) && (+selectionCoordinates[1] >= (x + width))) {
+                selectedStatesList.push(d3.select(this).datum());
+        }   
+    })
+
+    self.shiftChart.update(selectedStatesList)
 };

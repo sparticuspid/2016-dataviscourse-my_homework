@@ -13,6 +13,7 @@ function ShiftChart(){
 ShiftChart.prototype.init = function(){
     var self = this;
     self.divShiftChart = d3.select("#shiftChart").classed("sideBar", true);
+
 };
 
 /**
@@ -22,9 +23,21 @@ ShiftChart.prototype.init = function(){
  */
 ShiftChart.prototype.update = function(selectedStates){
     var self = this;
-
     // ******* TODO: PART V *******
     //Display the names of selected states in a list
+
+    var states = self.divShiftChart.select('#stateList').selectAll('li').data(selectedStates)
+        // .text(function (d) {return d.State})
+
+    states
+        .enter()
+        .append('li')
+        .merge(states)
+        .text(function (d) {return d.State})
+
+    states
+        .exit()
+        .remove()
 
     //******** TODO: PART VI*******
     //Use the shift data corresponding to the selected years and sketch a visualization
@@ -39,3 +52,4 @@ ShiftChart.prototype.update = function(selectedStates){
     //Update the visualization on brush events over the Year chart and Electoral Vote Chart
 
 };
+

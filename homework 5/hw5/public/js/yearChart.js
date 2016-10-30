@@ -7,12 +7,13 @@
  * @param electionInfo instance of ElectionInfo
  * @param electionWinners data corresponding to the winning parties over mutiple election years
  */
-function YearChart(electoralVoteChart, tileChart, votePercentageChart, electionWinners) {
+function YearChart(electoralVoteChart, tileChart, votePercentageChart, shiftChart, electionWinners) {
     var self = this;
 
     self.electoralVoteChart = electoralVoteChart;
     self.tileChart = tileChart;
     self.votePercentageChart = votePercentageChart;
+    self.shiftChart = shiftChart;
     self.electionWinners = electionWinners;
     self.init();
 };
@@ -21,7 +22,6 @@ function YearChart(electoralVoteChart, tileChart, votePercentageChart, electionW
  * Initializes the svg elements required for this chart
  */
 YearChart.prototype.init = function(){
-
     var self = this;
     self.margin = {top: 10, right: 20, bottom: 30, left: 50};
     var divyearChart = d3.select("#year-chart").classed("fullView", true);
@@ -38,6 +38,7 @@ YearChart.prototype.init = function(){
 
     self.circleRadius = 15;
     self.yCenter = 20;
+    self.yearPosition = self.yCenter + self.circleRadius + 25
 };
 
 /**
@@ -64,7 +65,6 @@ YearChart.prototype.chooseClass = function (party) {
  */
 YearChart.prototype.update = function(){
     var self = this;
-
     //Domain definition for global color scale
     var domain = [-60,-50,-40,-30,-20,-10,0,10,20,30,40,50,60 ];
 
@@ -75,6 +75,7 @@ YearChart.prototype.update = function(){
     self.colorScale = d3.scaleQuantile()
         .domain(domain).range(range);
 
+
     // ******* TODO: PART I *******
 
     // Create the chart by adding circle elements representing each election year
@@ -82,12 +83,21 @@ YearChart.prototype.update = function(){
     //HINT: Use the .yearChart class to style your circle elements
     //HINT: Use the chooseClass method to choose the color corresponding to the winning party.
 
-    
     var yearScale = d3.scaleLinear()
-        .range([self.margin.left, self.svgWidth])
+        .range([self.margin.left + 50, self.margin.left + self.svgWidth - 50])
         .domain([0, self.electionWinners.length])
 
     var yearChart = d3.select("#year-chart").select('svg')
+
+    //Style the chart by adding a dashed line that connects all these years.
+    //HINT: Use .lineChart to style this dashed line
+
+    yearChart.append('line')
+        .attr('class', 'lineChart')
+        .attr('x1', self.margin.left)
+        .attr('x2', self.margin.left + self.svgWidth + self.margin.right)
+        .attr('y1', self.yCenter)
+        .attr('y2', self.yCenter)
 
     var years = yearChart.selectAll('circle').data(self.electionWinners)
         .enter()
@@ -107,20 +117,13 @@ YearChart.prototype.update = function(){
         .classed('yeartext', true)
         .text(function (d) {return d.YEAR})
         .attr('x', function (d, i) {return yearScale(i)})
-        .attr('y', self.yCenter + self.circleRadius + 25)
-
-    //Style the chart by adding a dashed line that connects all these years.
-    //HINT: Use .lineChart to style this dashed line
-
-    yearChart.append('line')
-        .attr('class', 'tile')
-        .attr('y', 30)
-        .attr('x', 40)
+        .attr('y', self.yearPosition)
 
     //Clicking on any specific year should highlight that circle and  update the rest of the visualizations
     //HINT: Use .highlighted class to style the highlighted circle
-    
-    years.on("click", yearClickEvent)
+
+    years
+        .on("click", function(d){ self.yearClickEvent(d.YEAR)})
 
     //Election information corresponding to that year should be loaded and passed to
     // the update methods of other visualizations
@@ -134,19 +137,26 @@ YearChart.prototype.update = function(){
     //HINT: Use the .brush class to style the brush.
 }
 
-function yearClickEvent(d) {
+YearChart.prototype.yearClickEvent = function(d) {
+    // body...
 
-    var selectedYear = d.YEAR
-    var marginOfVictory = d.RD_Difference
+    var self = this;
+    var selectedYear = d
+    var states = []
 
-    d3.select('#year-chart').select('svg').selectAll('circle')
+    circles = d3.select('#year-chart').select('svg').selectAll('circle')
         .classed('highlighted', false);
 
-    d3.select(this)
+    circles
+        .filter(function (d) {return d.YEAR == selectedYear})
         .classed('highlighted', true)
 
     d3.csv('data/Year_Timeline_' + selectedYear + '.csv', function (error, csv) {
         var electionYearData = csv;
-        ElectoralVoteChart.prototype.update(electionYearData, function (d) {return colorScale(d.Total_EV)})
+        self.electoralVoteChart.update(electionYearData, self.colorScale)
+        self.votePercentageChart.update(electionYearData)
+        self.tileChart.update(electionYearData, self.colorScale)
+        self.shiftChart.update(states)
+
     })
 };

@@ -1,5 +1,3 @@
-
-
 body {
     font-family: Lato;
 }
@@ -15,14 +13,20 @@ h1 {
 .info{
     margin-left: 20px;
 }
+
 .tile {
     stroke: #FFF;
     stroke-width: 4;
 }
 
+.lineChart  {
+    stroke: black;
+    stroke-dasharray: 2px;
+}
+
 .yeartext, .tilestext, .brushtext{
     text-anchor:middle;
-    font-size: 24px;
+    font-size: 20px;
     fill: #565656;
     stroke-width: 0.1px;
     /*stroke: #e5e5e5;*/
@@ -33,8 +37,8 @@ h1 {
     font-size: 24px;
 }
 
-.electoralVoteText, .votesPercentageText{
-    font-size: 35px;
+.electoralVoteText, .votesPercentageText, .nomineeText {
+    font-size: 25px;
 }
 
 .end{

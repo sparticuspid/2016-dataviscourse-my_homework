@@ -23,9 +23,17 @@
         //pass this data and instances of all the charts that update on year selection to yearChart's constructor
         d3.csv("data/yearwiseWinner.csv", function (error, electionWinners) {
             //pass the instances of all the charts that update on selection change in YearChart
-            var yearChart = new YearChart(electoralVoteChart, tileChart, votePercentageChart, electionWinners);
+            var yearChart = new YearChart(electoralVoteChart, tileChart, votePercentageChart, shiftChart, electionWinners);
             yearChart.update();
+            yearChart.yearClickEvent(2012);
         });
+
+    //     d3.csv('data/Year_Timeline_2012.csv', function (error, csv) {
+    //     var electionYearData = csv;
+    //     var electoralVoteChart = new ElectoralVoteChart(shiftChart);
+    //     electoralVoteChart.update(electionYearData)
+    //     votePercentageChart.update(electionYearData)
+    // })
     }
 
     /**
